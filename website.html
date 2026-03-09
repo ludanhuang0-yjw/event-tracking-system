@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埋点管理系统 - 版本历史</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in-right { animation: slideInRight 0.3s ease-out; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .history-item {
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            background-color: #f8fafc;
+            border-left-color: #3b82f6;
+        }
+        .history-item.active {
+            background-color: #eff6ff;
+            border-left-color: #2563eb;
+        }
+        .diff-added { background-color: #dcfce7; color: #166534; }
+        .diff-removed { background-color: #fee2e2; color: #991b1b; }
+        .diff-changed { background-color: #fef9c3; color: #854d0e; }
+        .param-tag {
+            transition: all 0.2s;
+        }
+        .param-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <!-- 顶部导航 -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="app.goHome()">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                        📊
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800">埋点管理系统</h1>
+                        <p class="text-xs text-slate-500">Event Tracking with Version History</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="app.exportData()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        导出
+                    </button>
+                    <label class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        导入
+                        <input type="file" class="hidden" accept=".json" onchange="app.importData(this)">
+                    </label>
+                    <button onclick="app.openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        新增埋点
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- 列表视图 -->
+        <div id="listView" class="fade-in">
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">总埋点数</p>
+                            <p class="text-3xl font-bold text-slate-800 mt-1" id="totalCount">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-2xl">📈</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">今日更新</p>
+                            <p class="text-3xl font-bold text-emerald-600 mt-1" id="todayCount">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-2xl">✨</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">版本记录</p>
+                            <p class="text-3xl font-bold text-violet-600 mt-1" id="versionCount">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center text-2xl">📝</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">参数总数</p>
+                            <p class="text-3xl font-bold text-amber-600 mt-1" id="paramCount">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-2xl">🔧</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索栏 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1 relative">
+                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="搜索埋点名称、描述或参数..." 
+                               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               oninput="app.handleSearch()">
+                    </div>
+                    <select id="platformFilter" onchange="app.handleSearch()" 
+                            class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 min-w-[150px]">
+                        <option value="">所有平台</option>
+                        <option value="Web">Web</option>
+                        <option value="iOS">iOS</option>
+                        <option value="Android">Android</option>
+                        <option value="小程序">小程序</option>
+                        <option value="全平台">全平台</option>
+                    </select>
+                    <select id="sortBy" onchange="app.handleSearch()" 
+                            class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 min-w-[150px]">
+                        <option value="updated">最近更新</option>
+                        <option value="newest">最新创建</option>
+                        <option value="name">名称排序</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 埋点列表 -->
+            <div id="eventsList" class="space-y-4"></div>
+            <div id="emptyState" class="hidden text-center py-20">
+                <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🔍</div>
+                <h3 class="text-lg font-medium text-slate-900 mb-2">没有找到埋点</h3>
+                <p class="text-slate-500">试试调整搜索关键词或添加新的埋点</p>
+            </div>
+        </div>
+
+        <!-- 详情视图（默认隐藏） -->
+        <div id="detailView" class="hidden fade-in">
+            <div class="mb-6 flex items-center gap-4">
+                <button onclick="app.goHome()" class="p-2 hover:bg-slate-200 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </button>
+                <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-2xl font-bold text-slate-800 font-mono" id="detailEventName"></h2>
+                        <span id="detailEventNameZh" class="text-lg text-slate-600"></span>
+                    </div>
+                    <p class="text-sm text-slate-500 mt-1">查看版本历史和修改记录</p>
+                </div>
+                <button onclick="app.editCurrentEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    编辑当前版本
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 左侧：版本历史 -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 bg-slate-50">
+                            <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                版本历史
+                            </h3>
+                        </div>
+                        <div id="versionHistoryList" class="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：版本详情 -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" id="versionDetailPanel">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold" id="detailVersion"></span>
+                                    <span class="text-sm text-slate-500" id="detailDate"></span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-slate-800">版本详情</h3>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="app.compareWithPrevious()" id="compareBtn" class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                                    对比上一版本
+                                </button>
+                                <button onclick="app.restoreVersion()" id="restoreBtn" class="px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                                    回滚到此版本
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 基本信息 -->
+                        <div class="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-xl">
+                            <div>
+                                <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">平台</p>
+                                <p class="font-medium text-slate-800" id="detailPlatform"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">状态</p>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    已发布
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 描述 -->
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-slate-700 mb-2">描述说明</p>
+                            <p class="text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg" id="detailDesc"></p>
+                        </div>
+
+                        <!-- 参数列表 -->
+                        <div>
+                            <p class="text-sm font-medium text-slate-700 mb-3">参数定义</p>
+                            <div id="detailParameters" class="space-y-2">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+
+                        <!-- 对比视图（默认隐藏） -->
+                        <div id="diffView" class="hidden mt-6 pt-6 border-t border-slate-200">
+                            <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                版本对比
+                            </h4>
+                            <div id="diffContent" class="space-y-3 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 编辑弹窗 -->
+    <div id="editModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeEditModal()"></div>
+        <div class="absolute inset-y-0 right-0 w-full md:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto" id="editModalPanel">
+            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold text-slate-800" id="editModalTitle">编辑埋点</h2>
+                <button onclick="app.closeEditModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="eventForm" onsubmit="app.saveEvent(event)" class="p-6 space-y-6">
+                <input type="hidden" id="editEventId">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Event 名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="editEventName" required placeholder="例如：click_buy_button" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm bg-slate-50" readonly>
+                        <p class="mt-1 text-xs text-slate-500">Event 名称不可修改，如需修改请创建新埋点</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">中文名称</label>
+                        <input type="text" id="editEventNameZh" placeholder="例如：点击购买按钮" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">描述说明</label>
+                        <textarea id="editEventDesc" rows="3" placeholder="描述这个埋点的触发时机和业务含义..." 
+                                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">新版本号 <span class="text-red-500">*</span></label>
+                            <input type="text" id="editEventVersion" required placeholder="例如：1.1.0" 
+                                   class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <p class="mt-1 text-xs text-slate-500">版本号必须高于当前版本</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">平台</label>
+                            <select id="editEventPlatform" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="Web">Web</option>
+                                <option value="iOS">iOS</option>
+                                <option value="Android">Android</option>
+                                <option value="小程序">小程序</option>
+                                <option value="全平台">全平台</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">修改说明 <span class="text-red-500">*</span></label>
+                        <input type="text" id="editChangeLog" required placeholder="简要描述本次修改内容..." 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800">参数定义</h3>
+                        <button type="button" onclick="app.addEditParameter()" 
+                                class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            添加参数
+                        </button>
+                    </div>
+                    
+                    <div id="editParametersList" class="space-y-3"></div>
+                    <div id="editNoParams" class="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-lg hidden">
+                        暂无参数定义
+                    </div>
+                </div>
+
+                <div class="sticky bottom-0 bg-white border-t border-slate-200 pt-4 flex gap-3">
+                    <button type="button" onclick="app.closeEditModal()" 
+                            class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium">
+                        取消
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/30">
+                        保存新版本
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 创建新埋点弹窗 -->
+    <div id="createModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeCreateModal()"></div>
+        <div class="absolute inset-y-0 right-0 w-full md:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto" id="createModalPanel">
+            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold text-slate-800">创建新埋点</h2>
+                <button onclick="app.closeCreateModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="createForm" onsubmit="app.createNewEvent(event)" class="p-6 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Event 名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="newEventName" required placeholder="例如：click_buy_button" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">中文名称</label>
+                        <input type="text" id="newEventNameZh" placeholder="例如：点击购买按钮" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">描述说明</label>
+                        <textarea id="newEventDesc" rows="3" placeholder="描述这个埋点的触发时机和业务含义..." 
+                                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">初始版本 <span class="text-red-500">*</span></label>
+                            <input type="text" id="newEventVersion" required placeholder="1.0.0" value="1.0.0"
+                                   class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">平台</label>
+                            <select id="newEventPlatform" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="Web">Web</option>
+                                <option value="iOS">iOS</option>
+                                <option value="Android">Android</option>
+                                <option value="小程序">小程序</option>
+                                <option value="全平台">全平台</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800">参数定义</h3>
+                        <button type="button" onclick="app.addCreateParameter()" 
+                                class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            添加参数
+                        </button>
+                    </div>
+                    
+                    <div id="createParametersList" class="space-y-3"></div>
+                    <div id="createNoParams" class="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-lg">
+                        暂无参数定义，点击上方按钮添加
+                    </div>
+                </div>
+
+                <div class="sticky bottom-0 bg-white border-t border-slate-200 pt-4 flex gap-3">
+                    <button type="button" onclick="app.closeCreateModal()" 
+                            class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium">
+                        取消
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/30">
+                        创建埋点
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 删除确认 -->
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeDeleteModal()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full relative z-10">
+            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-center text-slate-900 mb-2">确认删除</h3>
+            <p class="text-center text-slate-500 mb-6">确定要删除埋点 <span id="deleteEventName" class="font-mono font-medium text-slate-700"></span> 吗？所有版本历史将被永久删除。</p>
+            <div class="flex gap-3">
+                <button onclick="app.closeDeleteModal()" class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium">取消</button>
+                <button onclick="app.confirmDelete()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium shadow-lg shadow-red-500/30">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <div class="bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
+            <span id="toastIcon">✓</span>
+            <span id="toastMessage">操作成功</span>
+        </div>
+    </div>
+
+    <script>
+        class TrackingManager {
+            constructor() {
+                this.events = [];
+                this.currentEventId = null;
+                this.currentVersionIndex = null;
+                this.deleteEventId = null;
+                this.init();
+            }
+
+            init() {
+                this.loadData();
+                this.renderList();
+                this.updateStats();
+            }
+
+            loadData() {
+                const saved = localStorage.getItem('tracking_events_v2');
+                if (saved) {
+                    this.events = JSON.parse(saved);
+                } else {
+                    // 示例数据，包含版本历史
+                    this.events = [
+                        {
+                            id: 'evt_1',
+                            name: 'page_view',
+                            nameZh: '页面浏览',
+                            currentVersion: '1.0.0',
+                            platform: 'Web',
+                            versions: [
+                                {
+                                    version: '1.0.0',
+                                    desc: '用户进入页面时触发，用于统计页面访问量',
+                                    platform: 'Web',
+                                    parameters: [
+                                        { name: 'page_name', type: 'string', desc: '页面名称', example: 'home' },
+                                        { name: 'referrer', type: 'string', desc: '来源页面', example: 'google' }
+                                    ],
+                                    changeLog: '初始版本创建',
+                                    createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+                                    createdBy: 'system'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'evt_2',
+                            name: 'click_buy_button',
+                            nameZh: '点击购买按钮',
+                            currentVersion: '1.2.0',
+                            platform: '全平台',
+                            versions: [
+                                {
+                                    version: '1.0.0',
+                                    desc: '用户在商品详情页点击购买按钮时触发',
+                                    platform: 'Web',
+                                    parameters: [
+                                        { name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' }
+                                    ],
+                                    changeLog: '初始版本',
+                                    createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+                                    createdBy: 'system'
+                                },
+                                {
+                                    version: '1.1.0',
+                                    desc: '用户在商品详情页点击购买按钮时触发，支持多平台',
+                                    platform: '全平台',
+                                    parameters: [
+                                        { name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' },
+                                        { name: 'price', type: 'number', desc: '商品价格', example: '99.99' }
+                                    ],
+                                    changeLog: '新增 price 参数，支持全平台',
+                                    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+                                    createdBy: 'system'
+                                },
+                                {
+                                    version: '1.2.0',
+                                    desc: '用户在商品详情页点击购买按钮时触发，支持多平台，新增货币字段',
+                                    platform: '全平台',
+                                    parameters: [
+                                        { name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' },
+                                        { name: 'price', type: 'number', desc: '商品价格', example: '99.99' },
+                                        { name: 'currency', type: 'string', desc: '货币单位', example: 'CNY' }
+                                    ],
+                                    changeLog: '新增 currency 参数支持多币种',
+                                    createdAt: new Date(Date.now() - 86400000).toISOString(),
+                                    createdBy: 'system'
+                                }
+                            ]
+                        }
+                    ];
+                    this.saveData();
+                }
+            }
+
+            saveData() {
+                localStorage.setItem('tracking_events_v2', JSON.stringify(this.events));
+                this.updateStats();
+            }
+
+            updateStats() {
+                document.getElementById('totalCount').textContent = this.events.length;
+                
+                const today = new Date().toDateString();
+                const todayCount = this.events.filter(e => {
+                    const lastVersion = e.versions[e.versions.length - 1];
+                    return new Date(lastVersion.createdAt).toDateString() === today;
+                }).length;
+                document.getElementById('todayCount').textContent = todayCount;
+                
+                const totalVersions = this.events.reduce((sum, e) => sum + e.versions.length, 0);
+                document.getElementById('versionCount').textContent = totalVersions;
+                
+                const paramCount = this.events.reduce((sum, e) => {
+                    const latest = e.versions[e.versions.length - 1];
+                    return sum + (latest.parameters?.length || 0);
+                }, 0);
+                document.getElementById('paramCount').textContent = paramCount;
+            }
+
+            // 列表渲染
+            handleSearch() {
+                this.renderList();
+            }
+
+            getFilteredEvents() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const platformFilter = document.getElementById('platformFilter').value;
+                const sortBy = document.getElementById('sortBy').value;
+
+                let filtered = this.events.filter(event => {
+                    const latest = event.versions[event.versions.length - 1];
+                    const matchSearch = !searchTerm || 
+                        event.name.toLowerCase().includes(searchTerm) ||
+                        event.nameZh?.toLowerCase().includes(searchTerm) ||
+                        latest.desc?.toLowerCase().includes(searchTerm) ||
+                        latest.parameters?.some(p => 
+                            p.name.toLowerCase().includes(searchTerm) || 
+                            p.desc.toLowerCase().includes(searchTerm)
+                        );
+                    
+                    const matchPlatform = !platformFilter || event.platform === platformFilter;
+                    return matchSearch && matchPlatform;
+                });
+
+                filtered.sort((a, b) => {
+                    const latestA = a.versions[a.versions.length - 1];
+                    const latestB = b.versions[b.versions.length - 1];
+                    
+                    if (sortBy === 'newest') return new Date(latestA.createdAt) - new Date(latestB.createdAt);
+                    if (sortBy === 'updated') return new Date(latestB.createdAt) - new Date(latestA.createdAt);
+                    if (sortBy === 'name') return a.name.localeCompare(b.name);
+                    return 0;
+                });
+
+                return filtered;
+            }
+
+            renderList() {
+                const container = document.getElementById('eventsList');
+                const emptyState = document.getElementById('emptyState');
+                const events = this.getFilteredEvents();
+
+                if (events.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                container.innerHTML = events.map(event => {
+                    const latest = event.versions[event.versions.length - 1];
+                    const platformColors = {
+                        'Web': 'bg-blue-100 text-blue-700',
+                        'iOS': 'bg-slate-100 text-slate-700',
+                        'Android': 'bg-emerald-100 text-emerald-700',
+                        '小程序': 'bg-green-100 text-green-700',
+                        '全平台': 'bg-violet-100 text-violet-700'
+                    };
+
+                    return `
+                        <div onclick="app.viewEventDetail('${event.id}')" 
+                             class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 class="text-lg font-bold text-slate-800 font-mono group-hover:text-blue-600 transition-colors">${event.name}</h3>
+                                        ${event.nameZh ? `<span class="text-slate-600">${event.nameZh}</span>` : ''}
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium ${platformColors[event.platform] || 'bg-slate-100 text-slate-700'}">
+                                            ${event.platform}
+                                        </span>
+                                    </div>
+                                    <p class="text-slate-600 text-sm line-clamp-2">${latest.desc || '暂无描述'}</p>
+                                </div>
+                                <div class="flex items-center gap-3 ml-4">
+                                    <div class="text-right">
+                                        <div class="flex items-center gap-2 text-sm font-medium text-slate-700">
+                                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                            v${event.currentVersion}
+                                        </div>
+                                        <div class="text-xs text-slate-400 mt-1">${event.versions.length} 个历史版本</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <div class="flex flex-wrap gap-2">
+                                    ${latest.parameters?.slice(0, 3).map(p => `
+                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-mono border border-slate-200">
+                                            ${p.name}<span class="text-slate-400 ml-1">${p.type}</span>
+                                        </span>
+                                    `).join('') || '<span class="text-xs text-slate-400 italic">无参数</span>'}
+                                    ${latest.parameters?.length > 3 ? `<span class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-xs">+${latest.parameters.length - 3}</span>` : ''}
+                                </div>
+                                <span class="text-xs text-slate-400">更新于 ${this.formatDate(latest.createdAt)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            formatDate(dateStr) {
+                const date = new Date(dateStr);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return '刚刚';
+                if (diff < 3600000) return `${Math.floor(diff/60000)}分钟前`;
+                if (diff < 86400000) return `${Math.floor(diff/3600000)}小时前`;
+                if (diff < 604800000) return `${Math.floor(diff/86400000)}天前`;
+                return date.toLocaleDateString('zh-CN');
+            }
+
+            // 详情页
+            viewEventDetail(eventId) {
+                this.currentEventId = eventId;
+                const event = this.events.find(e => e.id === eventId);
+                if (!event) return;
+
+                // 切换到详情视图
+                document.getElementById('listView').classList.add('hidden');
+                document.getElementById('detailView').classList.remove('hidden');
+                
+                // 更新标题
+                document.getElementById('detailEventName').textContent = event.name;
+                document.getElementById('detailEventNameZh').textContent = event.nameZh || '';
+                
+                // 渲染版本历史列表
+                this.renderVersionHistory(event);
+                
+                // 默认显示最新版本
+                this.selectVersion(0);
+            }
+
+            renderVersionHistory(event) {
+                const container = document.getElementById('versionHistoryList');
+                const versions = [...event.versions].reverse(); // 最新的在前
+                
+                container.innerHTML = versions.map((v, idx) => {
+                    const isLatest = idx === 0;
+                    return `
+                        <div onclick="app.selectVersion(${idx})" 
+                             class="history-item p-4 cursor-pointer ${idx === this.currentVersionIndex ? 'active' : ''}"
+                             data-index="${idx}">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-slate-800">v${v.version}</span>
+                                ${isLatest ? '<span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">当前</span>' : ''}
+                            </div>
+                            <p class="text-xs text-slate-500 mb-2 line-clamp-2">${v.changeLog}</p>
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ${this.formatDate(v.createdAt)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            selectVersion(index) {
+                this.currentVersionIndex = index;
+                const event = this.events.find(e => e.id === this.currentEventId);
+                const versions = [...event.versions].reverse();
+                const version = versions[index];
+                
+                // 更新历史列表高亮
+                document.querySelectorAll('.history-item').forEach((el, i) => {
+                    if (i === index) el.classList.add('active');
+                    else el.classList.remove('active');
+                });
+                
+                // 更新详情面板
+                document.getElementById('detailVersion').textContent = 'v' + version.version;
+                document.getElementById('detailDate').textContent = this.formatFullDate(version.createdAt);
+                document.getElementById('detailPlatform').textContent = version.platform;
+                document.getElementById('detailDesc').textContent = version.desc || '暂无描述';
+                
+                // 渲染参数
+                const paramContainer = document.getElementById('detailParameters');
+                if (version.parameters?.length > 0) {
+                    paramContainer.innerHTML = version.parameters.map(p => `
+                        <div class="param-tag flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <span class="font-mono font-medium text-slate-800">${p.name}</span>
+                                <span class="px-2 py-0.5 bg-white text-slate-500 text-xs rounded border border-slate-200">${p.type}</span>
+                                <span class="text-sm text-slate-600">${p.desc}</span>
+                            </div>
+                            ${p.example ? `<span class="text-xs font-mono text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">eg: ${p.example}</span>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    paramContainer.innerHTML = '<p class="text-slate-400 text-sm italic">此版本无参数定义</p>';
+                }
+                
+                // 隐藏对比视图
+                document.getElementById('diffView').classList.add('hidden');
+                
+                // 更新按钮状态
+                const isLatest = index === 0;
+                document.getElementById('restoreBtn').style.display = isLatest ? 'none' : 'inline-block';
+                document.getElementById('compareBtn').style.display = index < versions.length - 1 ? 'inline-block' : 'none';
+            }
+
+            formatFullDate(dateStr) {
+                return new Date(dateStr).toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            // 版本对比
+            compareWithPrevious() {
+                const event = this.events.find(e => e.id === this.currentEventId);
+                const versions = [...event.versions].reverse();
+                const current = versions[this.currentVersionIndex];
+                const previous = versions[this.currentVersionIndex + 1];
+                
+                if (!previous) {
+                    this.showToast('没有更早的版本', 'error');
+                    return;
+                }
+                
+                const diffContainer = document.getElementById('diffContent');
+                const diffView = document.getElementById('diffView');
+                diffView.classList.remove('hidden');
+                
+                let diffHtml = '';
+                
+                // 对比描述
+                if (current.desc !== previous.desc) {
+                    diffHtml += `
+                        <div class="p-3 rounded-lg border">
+                            <p class="text-xs font-medium text-slate-500 mb-1">描述变更</p>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="diff-removed p-2 rounded line-through opacity-70">${previous.desc || '无'}</div>
+                                <div class="diff-added p-2 rounded">${current.desc || '无'}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 对比平台
+                if (current.platform !== previous.platform) {
+                    diffHtml += `
+                        <div class="p-3 rounded-lg border">
+                            <p class="text-xs font-medium text-slate-500 mb-1">平台变更</p>
+                            <div class="flex gap-4 text-sm">
+                                <span class="diff-removed px-2 py-1 rounded">${previous.platform}</span>
+                                <span class="text-slate-400">→</span>
+                                <span class="diff-added px-2 py-1 rounded">${current.platform}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 对比参数
+                const prevParams = previous.parameters || [];
+                const currParams = current.parameters || [];
+                
+                const addedParams = currParams.filter(cp => !prevParams.find(pp => pp.name === cp.name));
+                const removedParams = prevParams.filter(pp => !currParams.find(cp => cp.name === pp.name));
+                const changedParams = currParams.filter(cp => {
+                    const pp = prevParams.find(p => p.name === cp.name);
+                    return pp && (pp.type !== cp.type || pp.desc !== cp.desc);
+                });
+                
+                if (addedParams.length > 0 || removedParams.length > 0 || changedParams.length > 0) {
+                    diffHtml += `<div class="p-3 rounded-lg border"><p class="text-xs font-medium text-slate-500 mb-2">参数变更</p><div class="space-y-2">`;
+                    
+                    addedParams.forEach(p => {
+                        diffHtml += `
+                            <div class="diff-added p-2 rounded text-sm flex items-center gap-2">
+                                <span class="font-mono font-medium">+ ${p.name}</span>
+                                <span class="text-xs bg-white px-1 rounded">${p.type}</span>
+                                <span class="text-slate-600">${p.desc}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    removedParams.forEach(p => {
+                        diffHtml += `
+                            <div class="diff-removed p-2 rounded text-sm flex items-center gap-2 line-through opacity-70">
+                                <span class="font-mono font-medium">- ${p.name}</span>
+                                <span class="text-xs bg-white px-1 rounded">${p.type}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    changedParams.forEach(p => {
+                        const oldP = prevParams.find(op => op.name === p.name);
+                        diffHtml += `
+                            <div class="diff-changed p-2 rounded text-sm">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-mono font-medium">~ ${p.name}</span>
+                                    <span class="text-xs text-slate-500">有修改</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs pl-4">
+                                    <div class="line-through opacity-60">${oldP.type} | ${oldP.desc}</div>
+                                    <div>${p.type} | ${p.desc}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    diffHtml += `</div></div>`;
+                }
+                
+                if (diffHtml === '') {
+                    diffHtml = '<p class="text-slate-500 text-center py-4">与上一版本相比无变更</p>';
+                }
+                
+                diffContainer.innerHTML = diffHtml;
+            }
+
+            // 回滚版本
+            restoreVersion() {
+                if (!confirm('确定要回滚到此版本吗？这将创建一个新的版本记录。')) return;
+                
+                const event = this.events.find(e => e.id === this.currentEventId);
+                const versions = [...event.versions].reverse();
+                const targetVersion = versions[this.currentVersionIndex];
+                
+                // 创建新版本，内容复制自历史版本
+                const newVersion = {
+                    ...targetVersion,
+                    version: this.incrementVersion(event.currentVersion),
+                    changeLog: `从 v${targetVersion.version} 回滚`,
+                    createdAt: new Date().toISOString(),
+                    createdBy: 'current_user'
+                };
+                
+                event.versions.push(newVersion);
+                event.currentVersion = newVersion.version;
+                
+                this.saveData();
+                this.renderVersionHistory(event);
+                this.selectVersion(0); // 选中最新版本
+                this.showToast('已回滚并创建新版本');
+            }
+
+            incrementVersion(version) {
+                const parts = version.split('.').map(Number);
+                parts[2] = (parts[2] || 0) + 1;
+                return parts.join('.');
+            }
+
+            // 导航
+            goHome() {
+                document.getElementById('detailView').classList.add('hidden');
+                document.getElementById('listView').classList.remove('hidden');
+                this.currentEventId = null;
+                this.currentVersionIndex = null;
+                this.renderList();
+            }
+
+            // 编辑当前版本
+            editCurrentEvent() {
+                if (!this.currentEventId) return;
+                this.openEditModal(this.currentEventId);
+            }
+
+            // 编辑弹窗
+            openEditModal(eventId) {
+                const event = this.events.find(e => e.id === eventId);
+                if (!event) return;
+                
+                const latest = event.versions[event.versions.length - 1];
+                
+                document.getElementById('editEventId').value = event.id;
+                document.getElementById('editEventName').value = event.name;
+                document.getElementById('editEventNameZh').value = event.nameZh || '';
+                document.getElementById('editEventDesc').value = latest.desc || '';
+                document.getElementById('editEventPlatform').value = latest.platform;
+                document.getElementById('editEventVersion').value = '';
+                document.getElementById('editChangeLog').value = '';
+                
+                // 渲染参数
+                const container = document.getElementById('editParametersList');
+                container.innerHTML = '';
+                document.getElementById('editNoParams').classList.add('hidden');
+                
+                if (latest.parameters?.length > 0) {
+                    latest.parameters.forEach(p => this.addEditParameter(p));
+                } else {
+                    document.getElementById('editNoParams').classList.remove('hidden');
+                }
+                
+                const modal = document.getElementById('editModal');
+                const panel = document.getElementById('editModalPanel');
+                modal.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+            }
+
+            closeEditModal() {
+                const modal = document.getElementById('editModal');
+                const panel = document.getElementById('editModalPanel');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            addEditParameter(data = null) {
+                const container = document.getElementById('editParametersList');
+                document.getElementById('editNoParams').classList.add('hidden');
+                
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-medium text-slate-500 uppercase">参数</span>
+                        <button type="button" onclick="this.closest('.bg-slate-50').remove(); app.checkEditEmptyParams()" 
+                                class="text-slate-400 hover:text-red-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" placeholder="参数名" value="${data?.name || ''}" required
+                               class="param-name w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                        <select class="param-type w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <option value="string" ${data?.type === 'string' ? 'selected' : ''}>string</option>
+                            <option value="number" ${data?.type === 'number' ? 'selected' : ''}>number</option>
+                            <option value="boolean" ${data?.type === 'boolean' ? 'selected' : ''}>boolean</option>
+                            <option value="object" ${data?.type === 'object' ? 'selected' : ''}>object</option>
+                            <option value="array" ${data?.type === 'array' ? 'selected' : ''}>array</option>
+                        </select>
+                    </div>
+                    <input type="text" placeholder="参数描述" value="${data?.desc || ''}" required
+                           class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    <input type="text" placeholder="示例值" value="${data?.example || ''}"
+                           class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                `;
+                container.appendChild(div);
+            }
+
+            checkEditEmptyParams() {
+                const container = document.getElementById('editParametersList');
+                if (container.children.length === 0) {
+                    document.getElementById('editNoParams').classList.remove('hidden');
+                }
+            }
+
+            saveEvent(e) {
+                e.preventDefault();
+                
+                const eventId = document.getElementById('editEventId').value;
+                const event = this.events.find(ev => ev.id === eventId);
+                const newVersion = document.getElementById('editEventVersion').value.trim();
+                
+                // 验证版本号
+                if (!newVersion) {
+                    this.showToast('请输入新版本号', 'error');
+                    return;
+                }
+                
+                // 检查版本号是否递增
+                const versions = event.versions.map(v => v.version);
+                if (versions.includes(newVersion)) {
+                    this.showToast('版本号已存在', 'error');
+                    return;
+                }
+                
+                // 收集参数
+                const parameters = [];
+                document.querySelectorAll('#editParametersList > div').forEach(row => {
+                    parameters.push({
+                        name: row.querySelector('.param-name').value.trim(),
+                        type: row.querySelector('.param-type').value,
+                        desc: row.querySelector('.param-desc').value.trim(),
+                        example: row.querySelector('.param-example').value.trim()
+                    });
+                });
+                
+                const versionData = {
+                    version: newVersion,
+                    desc: document.getElementById('editEventDesc').value.trim(),
+                    platform: document.getElementById('editEventPlatform').value,
+                    parameters: parameters,
+                    changeLog: document.getElementById('editChangeLog').value.trim(),
+                    createdAt: new Date().toISOString(),
+                    createdBy: 'current_user'
+                };
+                
+                event.versions.push(versionData);
+                event.currentVersion = newVersion;
+                event.nameZh = document.getElementById('editEventNameZh').value.trim();
+                
+                this.saveData();
+                this.closeEditModal();
+                
+                // 如果在详情页，刷新详情
+                if (this.currentEventId === eventId) {
+                    this.renderVersionHistory(event);
+                    this.selectVersion(0);
+                } else {
+                    this.renderList();
+                }
+                
+                this.showToast('新版本已保存');
+            }
+
+            // 创建新埋点
+            openCreateModal() {
+                document.getElementById('createForm').reset();
+                document.getElementById('createParametersList').innerHTML = '';
+                document.getElementById('createNoParams').classList.remove('hidden');
+                
+                const modal = document.getElementById('createModal');
+                const panel = document.getElementById('createModalPanel');
+                modal.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+            }
+
+            closeCreateModal() {
+                const modal = document.getElementById('createModal');
+                const panel = document.getElementById('createModalPanel');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            addCreateParameter() {
+                const container = document.getElementById('createParametersList');
+                document.getElementById('createNoParams').classList.add('hidden');
+                
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-medium text-slate-500 uppercase">参数</span>
+                        <button type="button" onclick="this.closest('.bg-slate-50').remove(); app.checkCreateEmptyParams()" 
+                                class="text-slate-400 hover:text-red-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" placeholder="参数名" required
+                               class="param-name w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                        <select class="param-type w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <option value="string">string</option>
+                            <option value="number">number</option>
+                            <option value="boolean">boolean</option>
+                            <option value="object">object</option>
+                            <option value="array">array</option>
+                        </select>
+                    </div>
+                    <input type="text" placeholder="参数描述" required
+                           class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    <input type="text" placeholder="示例值"
+                           class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                `;
+                container.appendChild(div);
+            }
+
+            checkCreateEmptyParams() {
+                const container = document.getElementById('createParametersList');
+                if (container.children.length === 0) {
+                    document.getElementById('createNoParams').classList.remove('hidden');
+                }
+            }
+
+            createNewEvent(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('newEventName').value.trim();
+                
+                // 检查名称唯一性
+                if (this.events.find(ev => ev.name === name)) {
+                    this.showToast('Event 名称已存在', 'error');
+                    return;
+                }
+                
+                const parameters = [];
+                document.querySelectorAll('#createParametersList > div').forEach(row => {
+                    parameters.push({
+                        name: row.querySelector('.param-name').value.trim(),
+                        type: row.querySelector('.param-type').value,
+                        desc: row.querySelector('.param-desc').value.trim(),
+                        example: row.querySelector('.param-example').value.trim()
+                    });
+                });
+                
+                const newEvent = {
+                    id: 'evt_' + Date.now(),
+                    name: name,
+                    nameZh: document.getElementById('newEventNameZh').value.trim(),
+                    currentVersion: document.getElementById('newEventVersion').value.trim(),
+                    platform: document.getElementById('newEventPlatform').value,
+                    versions: [{
+                        version: document.getElementById('newEventVersion').value.trim(),
+                        desc: document.getElementById('newEventDesc').value.trim(),
+                        platform: document.getElementById('newEventPlatform').value,
+                        parameters: parameters,
+                        changeLog: '初始版本创建',
+                        createdAt: new Date().toISOString(),
+                        createdBy: 'current_user'
+                    }]
+                };
+                
+                this.events.unshift(newEvent);
+                this.saveData();
+                this.closeCreateModal();
+                this.renderList();
+                this.showToast('埋点创建成功');
+            }
+
+            // 删除
+            deleteEvent(eventId) {
+                const event = this.events.find(e => e.id === eventId);
+                if (event) {
+                    this.deleteEventId = eventId;
+                    document.getElementById('deleteEventName').textContent = event.name;
+                    document.getElementById('deleteModal').classList.remove('hidden');
+                }
+            }
+
+            closeDeleteModal() {
+                document.getElementById('deleteModal').classList.add('hidden');
+                this.deleteEventId = null;
+            }
+
+            confirmDelete() {
+                if (this.deleteEventId) {
+                    this.events = this.events.filter(e => e.id !== this.deleteEventId);
+                    this.saveData();
+                    this.renderList();
+                    this.closeDeleteModal();
+                    this.showToast('埋点已删除');
+                }
+            }
+
+            // 导入导出
+            exportData() {
+                const dataStr = JSON.stringify(this.events, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tracking-events-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showToast('数据已导出');
+            }
+
+            importData(input) {
+                const file = input.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (Array.isArray(data)) {
+                            // 合并数据
+                            let added = 0;
+                            data.forEach(item => {
+                                if (!this.events.find(ev => ev.name === item.name)) {
+                                    this.events.push(item);
+                                    added++;
+                                }
+                            });
+                            this.saveData();
+                            this.renderList();
+                            this.showToast(`成功导入 ${added} 个埋点`);
+                        }
+                    } catch (err) {
+                        this.showToast('文件格式错误', 'error');
+                    }
+                    input.value = '';
+                };
+                reader.readAsText(file);
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                document.getElementById('toastMessage').textContent = message;
+                document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';
+                toast.className = `fixed bottom-6 right-6 z-50 transform transition-all duration-300 ${type === 'success' ? 'bg-slate-800' : 'bg-red-600'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3`;
+                
+                setTimeout(() => toast.classList.remove('translate-y-20', 'opacity-0'), 10);
+                setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+            }
+        }
+
+        const app = new TrackingManager();
+    </script>
+</body>
+</html>
