@@ -1,0 +1,1277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.1">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="Apple-converted-space"> </span>&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-CN"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;埋点管理系统 - 版本历史&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Inter', sans-serif; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.fade-in { animation: fadeIn 0.3s ease-out; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes fadeIn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>from { opacity: 0; transform: translateY(10px); }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to { opacity: 1; transform: translateY(0); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.slide-in-right { animation: slideInRight 0.3s ease-out; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes slideInRight {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>from { transform: translateX(100%); opacity: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to { transform: translateX(0); opacity: 1; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.history-item {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-left: 3px solid transparent;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.history-item:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f8fafc;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-left-color: #3b82f6;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.history-item.active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #eff6ff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-left-color: #2563eb;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.diff-added { background-color: #dcfce7; color: #166534; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.diff-removed { background-color: #fee2e2; color: #991b1b; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.diff-changed { background-color: #fef9c3; color: #854d0e; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.param-tag {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.param-tag:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="bg-slate-50 min-h-screen text-slate-800"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 顶部导航 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;nav class="bg-white border-b border-slate-200 sticky top-0 z-40"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-center h-16"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex items-center gap-3 cursor-pointer" onclick="app.goHome()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>📊</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h1 class="text-xl font-bold text-slate-800"&gt;埋点管理系统&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-xs text-slate-500"&gt;Event Tracking with Version History&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex items-center gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="app.exportData()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>导出</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 cursor-pointer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>导入</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="file" class="hidden" accept=".json" onchange="app.importData(this)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="app.openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>新增埋点</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/nav&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 主内容区 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- 列表视图 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="listView" class="fade-in"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- 统计卡片 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-500"&gt;总埋点数&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-3xl font-bold text-slate-800 mt-1" id="totalCount"&gt;0&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-2xl"&gt;📈&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-500"&gt;今日更新&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-3xl font-bold text-emerald-600 mt-1" id="todayCount"&gt;0&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-2xl"&gt;✨&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-500"&gt;版本记录&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-3xl font-bold text-violet-600 mt-1" id="versionCount"&gt;0&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center text-2xl"&gt;📝&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-500"&gt;参数总数&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-3xl font-bold text-amber-600 mt-1" id="paramCount"&gt;0&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-2xl"&gt;🔧&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- 搜索栏 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex flex-col md:flex-row gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex-1 relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"&gt;&lt;/path&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="searchInput" placeholder="搜索埋点名称、描述或参数..."<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"</p>
+<p class="p1"><span class="Apple-converted-space">                               </span>oninput="app.handleSearch()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="platformFilter" onchange="app.handleSearch()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 min-w-[150px]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value=""&gt;所有平台&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="Web"&gt;Web&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="iOS"&gt;iOS&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="Android"&gt;Android&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="小程序"&gt;小程序&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="全平台"&gt;全平台&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="sortBy" onchange="app.handleSearch()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 min-w-[150px]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="updated"&gt;最近更新&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="newest"&gt;最新创建&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="name"&gt;名称排序&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- 埋点列表 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="eventsList" class="space-y-4"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="emptyState" class="hidden text-center py-20"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl"&gt;🔍&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 class="text-lg font-medium text-slate-900 mb-2"&gt;没有找到埋点&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-slate-500"&gt;试试调整搜索关键词或添加新的埋点&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- 详情视图（默认隐藏） --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="detailView" class="hidden fade-in"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="mb-6 flex items-center gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.goHome()" class="p-2 hover:bg-slate-200 rounded-lg transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 class="text-2xl font-bold text-slate-800 font-mono" id="detailEventName"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span id="detailEventNameZh" class="text-lg text-slate-600"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p class="text-sm text-slate-500 mt-1"&gt;查看版本历史和修改记录&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.editCurrentEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>编辑当前版本</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="grid grid-cols-1 lg:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- 左侧：版本历史 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="lg:col-span-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="p-4 border-b border-slate-200 bg-slate-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 class="font-semibold text-slate-800 flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>版本历史</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="versionHistoryList" class="divide-y divide-slate-100 max-h-[600px] overflow-y-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- 动态生成 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- 右侧：版本详情 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="lg:col-span-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" id="versionDetailPanel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-start mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex items-center gap-3 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold" id="detailVersion"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span class="text-sm text-slate-500" id="detailDate"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 class="text-lg font-semibold text-slate-800"&gt;版本详情&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button onclick="app.compareWithPrevious()" id="compareBtn" class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>对比上一版本</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button onclick="app.restoreVersion()" id="restoreBtn" class="px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>回滚到此版本</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- 基本信息 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-xl"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-xs text-slate-500 uppercase tracking-wider mb-1"&gt;平台&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="font-medium text-slate-800" id="detailPlatform"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-xs text-slate-500 uppercase tracking-wider mb-1"&gt;状态&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>已发布</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- 描述 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-700 mb-2"&gt;描述说明&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg" id="detailDesc"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- 参数列表 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm font-medium text-slate-700 mb-3"&gt;参数定义&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div id="detailParameters" class="space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;!-- 动态生成 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- 对比视图（默认隐藏） --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="diffView" class="hidden mt-6 pt-6 border-t border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>版本对比</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div id="diffContent" class="space-y-3 text-sm"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 编辑弹窗 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="editModal" class="fixed inset-0 z-50 hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeEditModal()"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="absolute inset-y-0 right-0 w-full md:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto" id="editModalPanel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-xl font-bold text-slate-800" id="editModalTitle"&gt;编辑埋点&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.closeEditModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;form id="eventForm" onsubmit="app.saveEvent(event)" class="p-6 space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="hidden" id="editEventId"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;Event 名称 &lt;span class="text-red-500"&gt;*&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="editEventName" required placeholder="例如：click_buy_button"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm bg-slate-50" readonly&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="mt-1 text-xs text-slate-500"&gt;Event 名称不可修改，如需修改请创建新埋点&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;中文名称&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="editEventNameZh" placeholder="例如：点击购买按钮"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;描述说明&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;textarea id="editEventDesc" rows="3" placeholder="描述这个埋点的触发时机和业务含义..."<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"&gt;&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-2 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;新版本号 &lt;span class="text-red-500"&gt;*&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="text" id="editEventVersion" required placeholder="例如：1.1.0"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                   </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="mt-1 text-xs text-slate-500"&gt;版本号必须高于当前版本&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;平台&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="editEventPlatform" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="Web"&gt;Web&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="iOS"&gt;iOS&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="Android"&gt;Android&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="小程序"&gt;小程序&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="全平台"&gt;全平台&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;修改说明 &lt;span class="text-red-500"&gt;*&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="editChangeLog" required placeholder="简要描述本次修改内容..."<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="border-t border-slate-200 pt-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h3 class="text-lg font-semibold text-slate-800"&gt;参数定义&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" onclick="app.addEditParameter()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>添加参数</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="editParametersList" class="space-y-3"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="editNoParams" class="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-lg hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>暂无参数定义</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="sticky bottom-0 bg-white border-t border-slate-200 pt-4 flex gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button type="button" onclick="app.closeEditModal()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>取消</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button type="submit"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>保存新版本</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 创建新埋点弹窗 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="createModal" class="fixed inset-0 z-50 hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeCreateModal()"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="absolute inset-y-0 right-0 w-full md:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto" id="createModalPanel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-xl font-bold text-slate-800"&gt;创建新埋点&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.closeCreateModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;form id="createForm" onsubmit="app.createNewEvent(event)" class="p-6 space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;Event 名称 &lt;span class="text-red-500"&gt;*&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="newEventName" required placeholder="例如：click_buy_button"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;中文名称&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="newEventNameZh" placeholder="例如：点击购买按钮"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;描述说明&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;textarea id="newEventDesc" rows="3" placeholder="描述这个埋点的触发时机和业务含义..."<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"&gt;&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-2 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;初始版本 &lt;span class="text-red-500"&gt;*&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="text" id="newEventVersion" required placeholder="1.0.0" value="1.0.0"</p>
+<p class="p1"><span class="Apple-converted-space">                                   </span>class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label class="block text-sm font-medium text-slate-700 mb-2"&gt;平台&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="newEventPlatform" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="Web"&gt;Web&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="iOS"&gt;iOS&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="Android"&gt;Android&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="小程序"&gt;小程序&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="全平台"&gt;全平台&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="border-t border-slate-200 pt-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h3 class="text-lg font-semibold text-slate-800"&gt;参数定义&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" onclick="app.addCreateParameter()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>添加参数</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="createParametersList" class="space-y-3"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="createNoParams" class="text-center py-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>暂无参数定义，点击上方按钮添加</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="sticky bottom-0 bg-white border-t border-slate-200 pt-4 flex gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button type="button" onclick="app.closeCreateModal()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>取消</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button type="submit"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>创建埋点</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 删除确认 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeDeleteModal()"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full relative z-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 class="text-lg font-bold text-center text-slate-900 mb-2"&gt;确认删除&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="text-center text-slate-500 mb-6"&gt;确定要删除埋点 &lt;span id="deleteEventName" class="font-mono font-medium text-slate-700"&gt;&lt;/span&gt; 吗？所有版本历史将被永久删除。&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.closeDeleteModal()" class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"&gt;取消&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="app.confirmDelete()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium shadow-lg shadow-red-500/30"&gt;确认删除&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Toast --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span id="toastIcon"&gt;✓&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span id="toastMessage"&gt;操作成功&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>class TrackingManager {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>constructor() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.events = [];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentEventId = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentVersionIndex = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.deleteEventId = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.init();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>init() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.loadData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.updateStats();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadData() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const saved = localStorage.getItem('tracking_events_v2');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (saved) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.events = JSON.parse(saved);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// 示例数据，包含版本历史</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.events = [</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>id: 'evt_1',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>name: 'page_view',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>nameZh: '页面浏览',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>currentVersion: '1.0.0',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>platform: 'Web',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>versions: [</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>version: '1.0.0',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>desc: '用户进入页面时触发，用于统计页面访问量',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>platform: 'Web',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>parameters: [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'page_name', type: 'string', desc: '页面名称', example: 'home' },</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'referrer', type: 'string', desc: '来源页面', example: 'google' }</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>changeLog: '初始版本创建',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdBy: 'system'</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>id: 'evt_2',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>name: 'click_buy_button',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>nameZh: '点击购买按钮',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>currentVersion: '1.2.0',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>platform: '全平台',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>versions: [</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>version: '1.0.0',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>desc: '用户在商品详情页点击购买按钮时触发',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>platform: 'Web',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>parameters: [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' }</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>changeLog: '初始版本',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdBy: 'system'</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>version: '1.1.0',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>desc: '用户在商品详情页点击购买按钮时触发，支持多平台',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>platform: '全平台',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>parameters: [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' },</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'price', type: 'number', desc: '商品价格', example: '99.99' }</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>changeLog: '新增 price 参数，支持全平台',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdBy: 'system'</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>version: '1.2.0',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>desc: '用户在商品详情页点击购买按钮时触发，支持多平台，新增货币字段',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>platform: '全平台',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>parameters: [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'product_id', type: 'string', desc: '商品ID', example: 'SKU12345' },</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'price', type: 'number', desc: '商品价格', example: '99.99' },</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{ name: 'currency', type: 'string', desc: '货币单位', example: 'CNY' }</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>changeLog: '新增 currency 参数支持多币种',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdAt: new Date(Date.now() - 86400000).toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>createdBy: 'system'</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>saveData() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>localStorage.setItem('tracking_events_v2', JSON.stringify(this.events));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.updateStats();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateStats() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('totalCount').textContent = this.events.length;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const today = new Date().toDateString();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const todayCount = this.events.filter(e =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const lastVersion = e.versions[e.versions.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return new Date(lastVersion.createdAt).toDateString() === today;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}).length;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('todayCount').textContent = todayCount;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const totalVersions = this.events.reduce((sum, e) =&gt; sum + e.versions.length, 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('versionCount').textContent = totalVersions;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const paramCount = this.events.reduce((sum, e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const latest = e.versions[e.versions.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return sum + (latest.parameters?.length || 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('paramCount').textContent = paramCount;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 列表渲染</p>
+<p class="p1"><span class="Apple-converted-space">            </span>handleSearch() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>getFilteredEvents() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const searchTerm = document.getElementById('searchInput').value.toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const platformFilter = document.getElementById('platformFilter').value;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const sortBy = document.getElementById('sortBy').value;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>let filtered = this.events.filter(event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const latest = event.versions[event.versions.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const matchSearch = !searchTerm ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>event.name.toLowerCase().includes(searchTerm) ||</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>event.nameZh?.toLowerCase().includes(searchTerm) ||</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>latest.desc?.toLowerCase().includes(searchTerm) ||</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>latest.parameters?.some(p =&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>p.name.toLowerCase().includes(searchTerm) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>p.desc.toLowerCase().includes(searchTerm)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const matchPlatform = !platformFilter || event.platform === platformFilter;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return matchSearch &amp;&amp; matchPlatform;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>filtered.sort((a, b) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const latestA = a.versions[a.versions.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const latestB = b.versions[b.versions.length - 1];</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (sortBy === 'newest') return new Date(latestA.createdAt) - new Date(latestB.createdAt);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (sortBy === 'updated') return new Date(latestB.createdAt) - new Date(latestA.createdAt);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (sortBy === 'name') return a.name.localeCompare(b.name);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>return filtered;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderList() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('eventsList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const emptyState = document.getElementById('emptyState');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const events = this.getFilteredEvents();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (events.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>container.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>emptyState.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>emptyState.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>container.innerHTML = events.map(event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const latest = event.versions[event.versions.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const platformColors = {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'Web': 'bg-blue-100 text-blue-700',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'iOS': 'bg-slate-100 text-slate-700',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'Android': 'bg-emerald-100 text-emerald-700',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'小程序': 'bg-green-100 text-green-700',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'全平台': 'bg-violet-100 text-violet-700'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div onclick="app.viewEventDetail('${event.id}')"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                             </span>class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex justify-between items-start mb-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="flex items-center gap-3 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;h3 class="text-lg font-bold text-slate-800 font-mono group-hover:text-blue-600 transition-colors"&gt;${event.name}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>${event.nameZh ? `&lt;span class="text-slate-600"&gt;${event.nameZh}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;span class="px-2.5 py-0.5 rounded-full text-xs font-medium ${platformColors[event.platform] || 'bg-slate-100 text-slate-700'}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>${event.platform}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p class="text-slate-600 text-sm line-clamp-2"&gt;${latest.desc || '暂无描述'}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex items-center gap-3 ml-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="text-right"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="flex items-center gap-2 text-sm font-medium text-slate-700"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;span class="w-2 h-2 bg-blue-500 rounded-full"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>v${event.currentVersion}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="text-xs text-slate-400 mt-1"&gt;${event.versions.length} 个历史版本&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;svg class="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"&gt;&lt;/path&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex items-center justify-between pt-3 border-t border-slate-100"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex flex-wrap gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${latest.parameters?.slice(0, 3).map(p =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-mono border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>${p.name}&lt;span class="text-slate-400 ml-1"&gt;${p.type}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>`).join('') || '&lt;span class="text-xs text-slate-400 italic"&gt;无参数&lt;/span&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${latest.parameters?.length &gt; 3 ? `&lt;span class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-xs"&gt;+${latest.parameters.length - 3}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-xs text-slate-400"&gt;更新于 ${this.formatDate(latest.createdAt)}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}).join('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>formatDate(dateStr) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const date = new Date(dateStr);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const now = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const diff = now - date;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (diff &lt; 60000) return '刚刚';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (diff &lt; 3600000) return `${Math.floor(diff/60000)}分钟前`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (diff &lt; 86400000) return `${Math.floor(diff/3600000)}小时前`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (diff &lt; 604800000) return `${Math.floor(diff/86400000)}天前`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return date.toLocaleDateString('zh-CN');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 详情页</p>
+<p class="p1"><span class="Apple-converted-space">            </span>viewEventDetail(eventId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentEventId = eventId;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!event) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 切换到详情视图</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('listView').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailView').classList.remove('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 更新标题</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailEventName').textContent = event.name;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailEventNameZh').textContent = event.nameZh || '';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 渲染版本历史列表</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderVersionHistory(event);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 默认显示最新版本</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.selectVersion(0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderVersionHistory(event) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('versionHistoryList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versions = [...event.versions].reverse(); // 最新的在前</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>container.innerHTML = versions.map((v, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const isLatest = idx === 0;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div onclick="app.selectVersion(${idx})"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                             </span>class="history-item p-4 cursor-pointer ${idx === this.currentVersionIndex ? 'active' : ''}"</p>
+<p class="p1"><span class="Apple-converted-space">                             </span>data-index="${idx}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex items-center justify-between mb-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-bold text-slate-800"&gt;v${v.version}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${isLatest ? '&lt;span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full"&gt;当前&lt;/span&gt;' : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-xs text-slate-500 mb-2 line-clamp-2"&gt;${v.changeLog}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex items-center gap-2 text-xs text-slate-400"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${this.formatDate(v.createdAt)}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}).join('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>selectVersion(index) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentVersionIndex = index;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === this.currentEventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versions = [...event.versions].reverse();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const version = versions[index];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 更新历史列表高亮</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('.history-item').forEach((el, i) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (i === index) el.classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>else el.classList.remove('active');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 更新详情面板</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailVersion').textContent = 'v' + version.version;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailDate').textContent = this.formatFullDate(version.createdAt);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailPlatform').textContent = version.platform;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailDesc').textContent = version.desc || '暂无描述';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 渲染参数</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const paramContainer = document.getElementById('detailParameters');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (version.parameters?.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>paramContainer.innerHTML = version.parameters.map(p =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="param-tag flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-mono font-medium text-slate-800"&gt;${p.name}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="px-2 py-0.5 bg-white text-slate-500 text-xs rounded border border-slate-200"&gt;${p.type}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-sm text-slate-600"&gt;${p.desc}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${p.example ? `&lt;span class="text-xs font-mono text-slate-400 bg-white px-2 py-1 rounded border border-slate-200"&gt;eg: ${p.example}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>paramContainer.innerHTML = '&lt;p class="text-slate-400 text-sm italic"&gt;此版本无参数定义&lt;/p&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 隐藏对比视图</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('diffView').classList.add('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 更新按钮状态</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const isLatest = index === 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('restoreBtn').style.display = isLatest ? 'none' : 'inline-block';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('compareBtn').style.display = index &lt; versions.length - 1 ? 'inline-block' : 'none';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>formatFullDate(dateStr) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return new Date(dateStr).toLocaleString('zh-CN', {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>year: 'numeric',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>month: '2-digit',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>day: '2-digit',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>hour: '2-digit',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>minute: '2-digit'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 版本对比</p>
+<p class="p1"><span class="Apple-converted-space">            </span>compareWithPrevious() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === this.currentEventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versions = [...event.versions].reverse();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const current = versions[this.currentVersionIndex];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const previous = versions[this.currentVersionIndex + 1];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!previous) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.showToast('没有更早的版本', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const diffContainer = document.getElementById('diffContent');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const diffView = document.getElementById('diffView');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>diffView.classList.remove('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>let diffHtml = '';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 对比描述</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (current.desc !== previous.desc) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>diffHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="p-3 rounded-lg border"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-xs font-medium text-slate-500 mb-1"&gt;描述变更&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="grid grid-cols-2 gap-2 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="diff-removed p-2 rounded line-through opacity-70"&gt;${previous.desc || '无'}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="diff-added p-2 rounded"&gt;${current.desc || '无'}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 对比平台</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (current.platform !== previous.platform) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>diffHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="p-3 rounded-lg border"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-xs font-medium text-slate-500 mb-1"&gt;平台变更&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex gap-4 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="diff-removed px-2 py-1 rounded"&gt;${previous.platform}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-400"&gt;→&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="diff-added px-2 py-1 rounded"&gt;${current.platform}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 对比参数</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const prevParams = previous.parameters || [];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const currParams = current.parameters || [];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const addedParams = currParams.filter(cp =&gt; !prevParams.find(pp =&gt; pp.name === cp.name));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const removedParams = prevParams.filter(pp =&gt; !currParams.find(cp =&gt; cp.name === pp.name));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const changedParams = currParams.filter(cp =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const pp = prevParams.find(p =&gt; p.name === cp.name);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return pp &amp;&amp; (pp.type !== cp.type || pp.desc !== cp.desc);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (addedParams.length &gt; 0 || removedParams.length &gt; 0 || changedParams.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>diffHtml += `&lt;div class="p-3 rounded-lg border"&gt;&lt;p class="text-xs font-medium text-slate-500 mb-2"&gt;参数变更&lt;/p&gt;&lt;div class="space-y-2"&gt;`;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>addedParams.forEach(p =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>diffHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="diff-added p-2 rounded text-sm flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-mono font-medium"&gt;+ ${p.name}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-xs bg-white px-1 rounded"&gt;${p.type}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-600"&gt;${p.desc}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>removedParams.forEach(p =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>diffHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="diff-removed p-2 rounded text-sm flex items-center gap-2 line-through opacity-70"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-mono font-medium"&gt;- ${p.name}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-xs bg-white px-1 rounded"&gt;${p.type}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>changedParams.forEach(p =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const oldP = prevParams.find(op =&gt; op.name === p.name);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>diffHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="diff-changed p-2 rounded text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex items-center gap-2 mb-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span class="font-mono font-medium"&gt;~ ${p.name}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span class="text-xs text-slate-500"&gt;有修改&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="grid grid-cols-2 gap-2 text-xs pl-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="line-through opacity-60"&gt;${oldP.type} | ${oldP.desc}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;${p.type} | ${p.desc}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>diffHtml += `&lt;/div&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (diffHtml === '') {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>diffHtml = '&lt;p class="text-slate-500 text-center py-4"&gt;与上一版本相比无变更&lt;/p&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>diffContainer.innerHTML = diffHtml;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 回滚版本</p>
+<p class="p1"><span class="Apple-converted-space">            </span>restoreVersion() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!confirm('确定要回滚到此版本吗？这将创建一个新的版本记录。')) return;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === this.currentEventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versions = [...event.versions].reverse();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const targetVersion = versions[this.currentVersionIndex];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 创建新版本，内容复制自历史版本</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newVersion = {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>...targetVersion,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>version: this.incrementVersion(event.currentVersion),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>changeLog: `从 v${targetVersion.version} 回滚`,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>createdAt: new Date().toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>createdBy: 'current_user'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>event.versions.push(newVersion);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>event.currentVersion = newVersion.version;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderVersionHistory(event);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.selectVersion(0); // 选中最新版本</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.showToast('已回滚并创建新版本');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>incrementVersion(version) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const parts = version.split('.').map(Number);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>parts[2] = (parts[2] || 0) + 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return parts.join('.');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 导航</p>
+<p class="p1"><span class="Apple-converted-space">            </span>goHome() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('detailView').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('listView').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentEventId = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.currentVersionIndex = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 编辑当前版本</p>
+<p class="p1"><span class="Apple-converted-space">            </span>editCurrentEvent() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!this.currentEventId) return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.openEditModal(this.currentEventId);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 编辑弹窗</p>
+<p class="p1"><span class="Apple-converted-space">            </span>openEditModal(eventId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!event) return;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const latest = event.versions[event.versions.length - 1];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventId').value = event.id;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventName').value = event.name;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventNameZh').value = event.nameZh || '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventDesc').value = latest.desc || '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventPlatform').value = latest.platform;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editEventVersion').value = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editChangeLog').value = '';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 渲染参数</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('editParametersList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>container.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editNoParams').classList.add('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (latest.parameters?.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>latest.parameters.forEach(p =&gt; this.addEditParameter(p));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('editNoParams').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const modal = document.getElementById('editModal');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const panel = document.getElementById('editModalPanel');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modal.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; panel.classList.remove('translate-x-full'), 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>closeEditModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const modal = document.getElementById('editModal');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const panel = document.getElementById('editModalPanel');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>panel.classList.add('translate-x-full');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; modal.classList.add('hidden'), 300);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>addEditParameter(data = null) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('editParametersList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('editNoParams').classList.add('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const div = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>div.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>div.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="text-xs font-medium text-slate-500 uppercase"&gt;参数&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" onclick="this.closest('.bg-slate-50').remove(); app.checkEditEmptyParams()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>class="text-slate-400 hover:text-red-600"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-2 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" placeholder="参数名" value="${data?.name || ''}" required</p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="param-name w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select class="param-type w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="string" ${data?.type === 'string' ? 'selected' : ''}&gt;string&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="number" ${data?.type === 'number' ? 'selected' : ''}&gt;number&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="boolean" ${data?.type === 'boolean' ? 'selected' : ''}&gt;boolean&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="object" ${data?.type === 'object' ? 'selected' : ''}&gt;object&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="array" ${data?.type === 'array' ? 'selected' : ''}&gt;array&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" placeholder="参数描述" value="${data?.desc || ''}" required</p>
+<p class="p1"><span class="Apple-converted-space">                           </span>class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" placeholder="示例值" value="${data?.example || ''}"</p>
+<p class="p1"><span class="Apple-converted-space">                           </span>class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>container.appendChild(div);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>checkEditEmptyParams() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('editParametersList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (container.children.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('editNoParams').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>saveEvent(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>e.preventDefault();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const eventId = document.getElementById('editEventId').value;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(ev =&gt; ev.id === eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newVersion = document.getElementById('editEventVersion').value.trim();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 验证版本号</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!newVersion) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.showToast('请输入新版本号', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 检查版本号是否递增</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versions = event.versions.map(v =&gt; v.version);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (versions.includes(newVersion)) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.showToast('版本号已存在', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 收集参数</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const parameters = [];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('#editParametersList &gt; div').forEach(row =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>parameters.push({</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>name: row.querySelector('.param-name').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type: row.querySelector('.param-type').value,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>desc: row.querySelector('.param-desc').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>example: row.querySelector('.param-example').value.trim()</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const versionData = {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>version: newVersion,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>desc: document.getElementById('editEventDesc').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>platform: document.getElementById('editEventPlatform').value,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>parameters: parameters,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>changeLog: document.getElementById('editChangeLog').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>createdAt: new Date().toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>createdBy: 'current_user'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>event.versions.push(versionData);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>event.currentVersion = newVersion;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>event.nameZh = document.getElementById('editEventNameZh').value.trim();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.closeEditModal();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 如果在详情页，刷新详情</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (this.currentEventId === eventId) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.renderVersionHistory(event);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.selectVersion(0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.showToast('新版本已保存');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 创建新埋点</p>
+<p class="p1"><span class="Apple-converted-space">            </span>openCreateModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createForm').reset();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createParametersList').innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createNoParams').classList.remove('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const modal = document.getElementById('createModal');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const panel = document.getElementById('createModalPanel');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modal.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; panel.classList.remove('translate-x-full'), 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>closeCreateModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const modal = document.getElementById('createModal');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const panel = document.getElementById('createModalPanel');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>panel.classList.add('translate-x-full');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; modal.classList.add('hidden'), 300);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>addCreateParameter() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('createParametersList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createNoParams').classList.add('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const div = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>div.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>div.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="text-xs font-medium text-slate-500 uppercase"&gt;参数&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" onclick="this.closest('.bg-slate-50').remove(); app.checkCreateEmptyParams()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>class="text-slate-400 hover:text-red-600"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-2 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" placeholder="参数名" required</p>
+<p class="p1"><span class="Apple-converted-space">                               </span>class="param-name w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select class="param-type w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="string"&gt;string&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="number"&gt;number&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="boolean"&gt;boolean&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="object"&gt;object&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="array"&gt;array&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" placeholder="参数描述" required</p>
+<p class="p1"><span class="Apple-converted-space">                           </span>class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" placeholder="示例值"</p>
+<p class="p1"><span class="Apple-converted-space">                           </span>class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>container.appendChild(div);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>checkCreateEmptyParams() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const container = document.getElementById('createParametersList');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (container.children.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('createNoParams').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>createNewEvent(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>e.preventDefault();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const name = document.getElementById('newEventName').value.trim();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 检查名称唯一性</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (this.events.find(ev =&gt; ev.name === name)) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.showToast('Event 名称已存在', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const parameters = [];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('#createParametersList &gt; div').forEach(row =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>parameters.push({</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>name: row.querySelector('.param-name').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type: row.querySelector('.param-type').value,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>desc: row.querySelector('.param-desc').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>example: row.querySelector('.param-example').value.trim()</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newEvent = {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>id: 'evt_' + Date.now(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>name: name,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>nameZh: document.getElementById('newEventNameZh').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentVersion: document.getElementById('newEventVersion').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>platform: document.getElementById('newEventPlatform').value,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>versions: [{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>version: document.getElementById('newEventVersion').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>desc: document.getElementById('newEventDesc').value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>platform: document.getElementById('newEventPlatform').value,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>parameters: parameters,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>changeLog: '初始版本创建',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>createdAt: new Date().toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>createdBy: 'current_user'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.events.unshift(newEvent);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.closeCreateModal();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.showToast('埋点创建成功');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 删除</p>
+<p class="p1"><span class="Apple-converted-space">            </span>deleteEvent(eventId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = this.events.find(e =&gt; e.id === eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (event) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.deleteEventId = eventId;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('deleteEventName').textContent = event.name;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('deleteModal').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>closeDeleteModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('deleteModal').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.deleteEventId = null;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>confirmDelete() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (this.deleteEventId) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.events = this.events.filter(e =&gt; e.id !== this.deleteEventId);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.closeDeleteModal();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>this.showToast('埋点已删除');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 导入导出</p>
+<p class="p1"><span class="Apple-converted-space">            </span>exportData() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dataStr = JSON.stringify(this.events, null, 2);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const blob = new Blob([dataStr], { type: 'application/json' });</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.download = `tracking-events-${new Date().toISOString().split('T')[0]}.json`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>URL.revokeObjectURL(url);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>this.showToast('数据已导出');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>importData(input) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const file = input.files[0];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!file) return;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const reader = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>reader.onload = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const data = JSON.parse(e.target.result);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (Array.isArray(data)) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// 合并数据</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>let added = 0;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>data.forEach(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>if (!this.events.find(ev =&gt; ev.name === item.name)) {</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>this.events.push(item);</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>added++;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>this.saveData();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>this.renderList();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>this.showToast(`成功导入 ${added} 个埋点`);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>this.showToast('文件格式错误', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>input.value = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>reader.readAsText(file);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showToast(message, type = 'success') {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const toast = document.getElementById('toast');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('toastMessage').textContent = message;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>toast.className = `fixed bottom-6 right-6 z-50 transform transition-all duration-300 ${type === 'success' ? 'bg-slate-800' : 'bg-red-600'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3`;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; toast.classList.remove('translate-y-20', 'opacity-0'), 10);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; toast.classList.add('translate-y-20', 'opacity-0'), 3000);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const app = new TrackingManager();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
