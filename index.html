@@ -2065,7 +2065,7 @@
                 }, 500);
             }
 
-            // 导出Excel（带合并单元格功能，去掉了创建时间和修改日志，版本描述按版本合并）
+            // 导出Excel（只导出最新版本的参数）
             exportExcel() {
                 if (this.events.length === 0) {
                     this.showToast('没有数据可导出', 'error');
@@ -2078,40 +2078,24 @@
                 let currentRow = 1; // 从1开始，因为0是表头行
 
                 this.events.forEach(event => {
-                    // 遍历每个版本
-                    event.versions.forEach(version => {
-                        const params = version.parameters || [];
-                        const paramCount = params.length > 0 ? params.length : 1; // 无参数时至少占1行
-                        
-                        // 添加数据行
-                        if (params.length > 0) {
-                            params.forEach((param, paramIndex) => {
-                                let valueContent = '';
-                                if (param.valueType === 'fixed' && param.fixedValues) {
-                                    // 导出格式：值(含义), 值(含义)
-                                    valueContent = param.fixedValues.map(fv => {
-                                        return fv.desc ? `${fv.value}(${fv.desc})` : fv.value;
-                                    }).join(', ');
-                                } else {
-                                    valueContent = param.example || '';
-                                }
-                                
-                                exportData.push({
-                                    'Event名称': event.name,
-                                    '中文名称': event.nameZh || '',
-                                    '所属模块': event.module || '',
-                                    '状态': this.getStatusText(event.status),
-                                    '版本号': version.version,
-                                    '版本描述': version.desc || '',
-                                    '参数名': param.name,
-                                    '参数类型': param.type,
-                                    '参数描述': param.desc,
-                                    '值类型': param.valueType === 'fixed' ? '固定值' : '示例值',
-                                    '值内容': valueContent
-                                });
-                            });
-                        } else {
-                            // 无参数的版本也占一行
+                    // 只取最新版本，不再遍历所有版本
+                    const version = event.versions[event.versions.length - 1];
+                    const params = version.parameters || [];
+                    const paramCount = params.length > 0 ? params.length : 1; // 无参数时至少占1行
+                    
+                    // 添加数据行
+                    if (params.length > 0) {
+                        params.forEach((param, paramIndex) => {
+                            let valueContent = '';
+                            if (param.valueType === 'fixed' && param.fixedValues) {
+                                // 导出格式：值(含义), 值(含义)
+                                valueContent = param.fixedValues.map(fv => {
+                                    return fv.desc ? `${fv.value}(${fv.desc})` : fv.value;
+                                }).join(', ');
+                            } else {
+                                valueContent = param.example || '';
+                            }
+                            
                             exportData.push({
                                 'Event名称': event.name,
                                 '中文名称': event.nameZh || '',
@@ -2119,51 +2103,45 @@
                                 '状态': this.getStatusText(event.status),
                                 '版本号': version.version,
                                 '版本描述': version.desc || '',
-                                '参数名': '',
-                                '参数类型': '',
-                                '参数描述': '',
-                                '值类型': '',
-                                '值内容': ''
+                                '参数名': param.name,
+                                '参数类型': param.type,
+                                '参数描述': param.desc,
+                                '值类型': param.valueType === 'fixed' ? '固定值' : '示例值',
+                                '值内容': valueContent
                             });
-                        }
-                        
-                        // 如果该版本有多行，添加版本级别的合并（版本号和版本描述）
-                        if (paramCount > 1) {
-                            const startRow = currentRow;
-                            const endRow = currentRow + paramCount - 1;
-                            
-                            // 合并版本号列（第4列）和版本描述列（第5列）
-                            [4, 5].forEach(col => {
-                                merges.push({
-                                    s: {r: startRow, c: col},
-                                    e: {r: endRow, c: col}
-                                });
-                            });
-                        }
-                        
-                        currentRow += paramCount;
-                    });
+                        });
+                    } else {
+                        // 无参数的版本也占一行
+                        exportData.push({
+                            'Event名称': event.name,
+                            '中文名称': event.nameZh || '',
+                            '所属模块': event.module || '',
+                            '状态': this.getStatusText(event.status),
+                            '版本号': version.version,
+                            '版本描述': version.desc || '',
+                            '参数名': '',
+                            '参数类型': '',
+                            '参数描述': '',
+                            '值类型': '',
+                            '值内容': ''
+                        });
+                    }
                     
-                    // 计算整个 Event 占用的行数，合并 Event 级别的前4列
-                    let eventRowCount = 0;
-                    event.versions.forEach(version => {
-                        const paramCount = version.parameters?.length || 0;
-                        eventRowCount += Math.max(paramCount, 1);
-                    });
-                    
-                    // 合并 Event 级别的前4列（Event名称、中文名称、所属模块、状态）
-                    if (eventRowCount > 1) {
-                        // 找到当前 Event 的起始行
-                        const startRow = currentRow - eventRowCount;
-                        const endRow = currentRow - 1;
+                    // 如果该事件有多行参数，合并事件级别的列（前6列：Event名称、中文名称、所属模块、状态、版本号、版本描述）
+                    if (paramCount > 1) {
+                        const startRow = currentRow;
+                        const endRow = currentRow + paramCount - 1;
                         
-                        for (let col = 0; col < 4; col++) {
+                        // 合并前6列（0-5列）
+                        for (let col = 0; col < 6; col++) {
                             merges.push({
                                 s: {r: startRow, c: col},
                                 e: {r: endRow, c: col}
                             });
                         }
                     }
+                    
+                    currentRow += paramCount;
                 });
 
                 // 创建工作簿
@@ -2175,7 +2153,7 @@
                     ws['!merges'] = merges;
                 }
                 
-                // 设置列宽（去掉了创建时间和修改日志对应的列宽）
+                // 设置列宽
                 const colWidths = [
                     {wch: 20}, // Event名称 (0)
                     {wch: 15}, // 中文名称 (1)
@@ -2196,10 +2174,10 @@
                 // 下载文件
                 const dateStr = new Date().toISOString().split('T')[0];
                 XLSX.writeFile(wb, `埋点数据_${dateStr}.xlsx`);
-                this.showToast('Excel导出成功');
+                this.showToast('Excel导出成功（仅含最新版本）');
             }
 
-            // 下载模板（去掉创建时间和修改日志）
+            // 下载模板
             downloadTemplate() {
                 const templateData = [
                     {
@@ -2281,7 +2259,7 @@
                 this.showToast('模板下载成功');
             }
 
-            // 导入Excel（去掉创建时间和修改日志的处理）
+            // 导入Excel
             importExcel(input) {
                 const file = input.files[0];
                 if (!file) return;
