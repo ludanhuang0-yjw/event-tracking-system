@@ -261,6 +261,11 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         编辑当前版本
                     </button>
+                    <!-- 新增复制按钮 -->
+                    <button onclick="app.openCopyModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        复制埋点
+                    </button>
                     <button onclick="app.deleteCurrentEvent()" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         删除
@@ -479,6 +484,124 @@
         </div>
     </div>
 
+    <!-- 复制埋点弹窗（新增） -->
+    <div id="copyModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeCopyModal()"></div>
+        <div class="absolute inset-y-0 right-0 w-full md:w-[650px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto custom-scrollbar" id="copyModalPanel">
+            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">复制埋点</h2>
+                    <p class="text-sm text-slate-500 mt-1">基于 "<span id="copySourceEventName" class="font-mono text-blue-600"></span>" 创建副本</p>
+                </div>
+                <button onclick="app.closeCopyModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="copyForm" onsubmit="app.copyEvent(event)" class="p-6 space-y-6">
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div class="text-sm text-blue-800">
+                            <p class="font-medium mb-1">复制说明</p>
+                            <p class="text-blue-600">将复制原埋点的所有版本历史和参数定义。你需要为新埋点指定一个唯一的名称。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- 新 Event 名称 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">新 Event 名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="copyEventName" required placeholder="例如：click_buy_button_v2" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm">
+                        <p class="mt-1 text-xs text-slate-500">必须使用新名称，不能与现有埋点重复</p>
+                        <p id="copyNameError" class="hidden mt-1 text-xs text-red-600 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            该名称已被使用，请选择其他名称
+                        </p>
+                    </div>
+                    
+                    <!-- 中文名称 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">中文名称</label>
+                        <input type="text" id="copyEventNameZh" placeholder="例如：点击购买按钮（副本）" 
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- 所属模块 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">所属业务模块 <span class="text-red-500">*</span></label>
+                        <div class="flex gap-2">
+                            <select id="copyEventModule" required onchange="app.handleModuleChange('copy')"
+                                    class="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">选择模块...</option>
+                                <option value="广告">广告</option>
+                                <option value="支付">支付</option>
+                                <option value="用户中心">用户中心</option>
+                                <option value="首页">首页</option>
+                                <option value="商品">商品</option>
+                                <option value="订单">订单</option>
+                                <option value="搜索">搜索</option>
+                                <option value="消息推送">消息推送</option>
+                                <option value="custom">自定义...</option>
+                            </select>
+                            <input type="text" id="copyEventModuleCustom" placeholder="输入模块名" 
+                                   class="hidden flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- 使用状态 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">当前状态 <span class="text-red-500">*</span></label>
+                        <select id="copyEventStatus" required
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="developing">🔨 开发中</option>
+                            <option value="done">✅ 已完成</option>
+                            <option value="testing">🧪 测试中</option>
+                            <option value="online">🚀 已上线</option>
+                        </select>
+                    </div>
+
+                    <!-- 描述 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">描述说明</label>
+                        <textarea id="copyEventDesc" rows="3" 
+                                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 复制的参数预览（只读） -->
+                <div class="border-t border-slate-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">继承的参数</h3>
+                            <p class="text-sm text-slate-500 mt-1">将复制原埋点最新版本的 <span id="copyParamCount" class="font-medium text-slate-700">0</span> 个参数</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded border border-slate-200">只读预览</span>
+                    </div>
+                    
+                    <div id="copyParametersPreview" class="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+
+                <div class="sticky bottom-0 bg-white border-t border-slate-200 pt-4 flex gap-3">
+                    <button type="button" onclick="app.closeCopyModal()" 
+                            class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" id="copySubmitBtn"
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        确认复制
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 编辑弹窗 -->
     <div id="editModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeEditModal()"></div>
@@ -589,6 +712,7 @@
                 this.currentEventId = null;
                 this.currentVersionIndex = null;
                 this.deleteEventId = null;
+                this.copySourceEvent = null; // 用于存储待复制的源事件
                 this.init();
             }
 
@@ -953,8 +1077,8 @@
 
             // 模块选择处理
             handleModuleChange(type) {
-                const select = document.getElementById(type === 'create' ? 'newEventModule' : 'editEventModule');
-                const customInput = document.getElementById(type === 'create' ? 'newEventModuleCustom' : 'editEventModuleCustom');
+                const select = document.getElementById(type === 'create' ? 'newEventModule' : type === 'copy' ? 'copyEventModule' : 'editEventModule');
+                const customInput = document.getElementById(type === 'create' ? 'newEventModuleCustom' : type === 'copy' ? 'copyEventModuleCustom' : 'editEventModuleCustom');
                 
                 if (select.value === 'custom') {
                     customInput.classList.remove('hidden');
@@ -1775,6 +1899,175 @@
                     this.closeDeleteModal();
                     this.showToast('埋点已删除');
                 }
+            }
+
+            // 【新增】复制埋点相关方法
+            openCopyModal() {
+                if (!this.currentEventId) return;
+                
+                const sourceEvent = this.events.find(e => e.id === this.currentEventId);
+                if (!sourceEvent) return;
+                
+                this.copySourceEvent = sourceEvent;
+                
+                // 填充表单
+                document.getElementById('copySourceEventName').textContent = sourceEvent.name;
+                document.getElementById('copyEventName').value = sourceEvent.name + '_copy';
+                document.getElementById('copyEventNameZh').value = (sourceEvent.nameZh || '') + '（副本）';
+                document.getElementById('copyEventDesc').value = sourceEvent.versions[sourceEvent.versions.length - 1].desc || '';
+                
+                // 设置模块选择
+                const moduleSelect = document.getElementById('copyEventModule');
+                const moduleCustom = document.getElementById('copyEventModuleCustom');
+                if (sourceEvent.module && [...moduleSelect.options].some(o => o.value === sourceEvent.module)) {
+                    moduleSelect.value = sourceEvent.module;
+                    moduleCustom.classList.add('hidden');
+                } else {
+                    moduleSelect.value = 'custom';
+                    moduleCustom.classList.remove('hidden');
+                    moduleCustom.value = sourceEvent.module || '';
+                }
+                
+                // 设置状态
+                document.getElementById('copyEventStatus').value = sourceEvent.status;
+                
+                // 显示参数预览
+                const latestVersion = sourceEvent.versions[sourceEvent.versions.length - 1];
+                const params = latestVersion.parameters || [];
+                document.getElementById('copyParamCount').textContent = params.length;
+                
+                const previewContainer = document.getElementById('copyParametersPreview');
+                if (params.length > 0) {
+                    previewContainer.innerHTML = params.map(p => {
+                        let valueInfo = '';
+                        if (p.valueType === 'fixed' && p.fixedValues?.length > 0) {
+                            valueInfo = `<span class="text-xs text-slate-500">固定值: ${p.fixedValues.map(fv => fv.value + (fv.desc ? `(${fv.desc})` : '')).join(', ')}</span>`;
+                        } else if (p.example) {
+                            valueInfo = `<span class="text-xs text-slate-500">示例: ${p.example}</span>`;
+                        }
+                        
+                        return `
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 text-sm">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-mono font-medium text-slate-800">${p.name}</span>
+                                    <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-xs rounded">${p.type}</span>
+                                    <span class="px-1.5 py-0.5 ${p.valueType === 'fixed' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'} text-xs rounded">${p.valueType === 'fixed' ? '固定' : '示例'}</span>
+                                </div>
+                                <div class="text-slate-600 text-xs mb-1">${p.desc}</div>
+                                ${valueInfo}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    previewContainer.innerHTML = '<p class="text-sm text-slate-400 italic text-center py-4">原埋点无参数定义</p>';
+                }
+                
+                // 重置错误提示
+                document.getElementById('copyNameError').classList.add('hidden');
+                document.getElementById('copyEventName').classList.remove('border-red-500', 'focus:ring-red-500');
+                
+                const modal = document.getElementById('copyModal');
+                const panel = document.getElementById('copyModalPanel');
+                modal.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                
+                // 添加实时验证
+                document.getElementById('copyEventName').oninput = (e) => {
+                    const newName = e.target.value.trim();
+                    const nameError = document.getElementById('copyNameError');
+                    const submitBtn = document.getElementById('copySubmitBtn');
+                    
+                    if (newName && this.events.find(ev => ev.name === newName)) {
+                        nameError.classList.remove('hidden');
+                        e.target.classList.add('border-red-500', 'focus:ring-red-500');
+                        e.target.classList.remove('border-slate-300', 'focus:ring-blue-500');
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        nameError.classList.add('hidden');
+                        e.target.classList.remove('border-red-500', 'focus:ring-red-500');
+                        e.target.classList.add('border-slate-300', 'focus:ring-blue-500');
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                };
+            }
+
+            closeCopyModal() {
+                const modal = document.getElementById('copyModal');
+                const panel = document.getElementById('copyModalPanel');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    this.copySourceEvent = null;
+                    document.getElementById('copyEventName').oninput = null; // 移除验证事件
+                }, 300);
+            }
+
+            copyEvent(e) {
+                e.preventDefault();
+                
+                if (!this.copySourceEvent) return;
+                
+                const newName = document.getElementById('copyEventName').value.trim();
+                
+                // 再次验证名称是否重复
+                if (this.events.find(ev => ev.name === newName)) {
+                    this.showToast('Event 名称已存在，请使用其他名称', 'error');
+                    document.getElementById('copyEventName').focus();
+                    return;
+                }
+                
+                // 获取模块值
+                const moduleSelect = document.getElementById('copyEventModule');
+                const moduleCustom = document.getElementById('copyEventModuleCustom');
+                const module = moduleSelect.value === 'custom' ? moduleCustom.value.trim() : moduleSelect.value;
+                
+                if (!module) {
+                    this.showToast('请选择或输入所属模块', 'error');
+                    return;
+                }
+                
+                // 深拷贝版本数据
+                const copiedVersions = this.copySourceEvent.versions.map(v => ({
+                    ...v,
+                    parameters: v.parameters ? v.parameters.map(p => ({
+                        ...p,
+                        fixedValues: p.fixedValues ? p.fixedValues.map(fv => ({...fv})) : undefined
+                    })) : [],
+                    createdAt: new Date().toISOString(), // 更新时间
+                    createdBy: 'current_user',
+                    changeLog: v.changeLog + ' (复制自 ' + this.copySourceEvent.name + ')'
+                }));
+                
+                const newEvent = {
+                    id: 'evt_' + Date.now(),
+                    name: newName,
+                    nameZh: document.getElementById('copyEventNameZh').value.trim(),
+                    module: module,
+                    status: document.getElementById('copyEventStatus').value,
+                    currentVersion: this.copySourceEvent.currentVersion,
+                    versions: copiedVersions
+                };
+                
+                // 更新最新版本的changeLog
+                const latestVersion = newEvent.versions[newEvent.versions.length - 1];
+                latestVersion.changeLog = `从 ${this.copySourceEvent.name} 复制创建`;
+                
+                this.events.unshift(newEvent);
+                this.saveData();
+                this.closeCopyModal();
+                this.renderList();
+                
+                // 询问是否跳转到新埋点详情
+                this.showToast(`埋点 "${newName}" 复制成功`);
+                
+                // 高亮新创建的埋点并可选中
+                setTimeout(() => {
+                    if (confirm('是否查看新复制的埋点详情？')) {
+                        this.viewEventDetail(newEvent.id);
+                    }
+                }, 500);
             }
 
             // 【修改7】exportExcel：导出时包含固定值含义
