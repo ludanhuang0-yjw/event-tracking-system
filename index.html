@@ -66,9 +66,69 @@
         /* 值类型标签 */
         .value-type-example { background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
         .value-type-fixed { background-color: #fce7f3; color: #be185d; border-color: #fbcfe8; }
+        
+        /* 权限提示遮罩 */
+        .permission-denied {
+            position: relative;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+        .permission-denied::after {
+            content: "🔒 无权限";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <!-- 登录模态框（默认显示） -->
+    <div id="loginModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg mx-auto mb-4">
+                    📊
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">埋点管理系统</h1>
+                <p class="text-slate-500 mt-2">请选择您的身份登录</p>
+            </div>
+
+            <div class="space-y-4">
+                <button onclick="app.login('admin')" class="w-full p-4 border-2 border-blue-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">👨‍💼</div>
+                        <div>
+                            <div class="font-bold text-slate-800">管理员</div>
+                            <div class="text-sm text-slate-500">拥有所有权限（增删改查、导出）</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="app.login('viewer')" class="w-full p-4 border-2 border-slate-100 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">👀</div>
+                        <div>
+                            <div class="font-bold text-slate-800">访客/只读用户</div>
+                            <div class="text-sm text-slate-500">仅可查看和导出数据</div>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="mt-6 text-center text-xs text-slate-400">
+                <p>提示：此系统仅演示权限功能，实际生产环境请接入真实身份认证系统</p>
+            </div>
+        </div>
+    </div>
 
     <!-- 顶部导航 -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -83,26 +143,43 @@
                         <p class="text-xs text-slate-500">Event Tracking with Version History</p>
                     </div>
                 </div>
+                
+                <!-- 右侧：权限标识 + 操作按钮 -->
                 <div class="flex items-center gap-4">
-                    <!-- 导出Excel -->
+                    <!-- 当前用户角色标签 -->
+                    <div id="userRoleBadge" class="hidden px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2">
+                        <span id="roleIcon">👤</span>
+                        <span id="roleText">未登录</span>
+                    </div>
+
+                    <!-- 导出Excel（所有角色可见） -->
                     <button onclick="app.exportExcel()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-600 transition-colors flex items-center gap-2 rounded-lg hover:bg-green-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         导出Excel
                     </button>
-                    <!-- 下载模板 -->
+
+                    <!-- 下载模板（所有角色可见） -->
                     <button onclick="app.downloadTemplate()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 rounded-lg hover:bg-blue-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         下载模板
                     </button>
-                    <!-- 导入Excel -->
-                    <label class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 cursor-pointer rounded-lg hover:bg-blue-50">
+
+                    <!-- 导入Excel（仅管理员可见） -->
+                    <label id="importBtn" class="hidden px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 cursor-pointer rounded-lg hover:bg-blue-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         导入Excel
                         <input type="file" class="hidden" accept=".xlsx,.xls" onchange="app.importExcel(this)">
                     </label>
-                    <button onclick="app.openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 hover:scale-105 active:scale-95">
+
+                    <!-- 新增埋点（仅管理员可见） -->
+                    <button id="createBtn" onclick="app.openCreateModal()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 hover:scale-105 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         新增埋点
+                    </button>
+
+                    <!-- 登出按钮 -->
+                    <button onclick="app.logout()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title="退出登录">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </div>
             </div>
@@ -111,6 +188,15 @@
 
     <!-- 主内容区 -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- 权限提示条（仅访客可见） -->
+        <div id="viewerNotice" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex-1">
+                <span class="font-medium">当前为只读模式</span>
+                <span class="text-sm text-amber-700 ml-2">您可以查看和导出数据，但无法进行修改操作</span>
+            </div>
+        </div>
         
         <!-- 列表视图 -->
         <div id="listView" class="fade-in">
@@ -257,24 +343,26 @@
                     </p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="app.editCurrentEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
+                    <!-- 编辑按钮（仅管理员可见） -->
+                    <button id="detailEditBtn" onclick="app.editCurrentEvent()" class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         编辑当前版本
                     </button>
-                    <!-- 新增复制按钮 -->
-                    <button onclick="app.openCopyModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2">
+                    <!-- 复制按钮（仅管理员可见） -->
+                    <button id="detailCopyBtn" onclick="app.openCopyModal()" class="hidden px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         复制埋点
                     </button>
-                    <button onclick="app.deleteCurrentEvent()" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2">
+                    <!-- 删除按钮（仅管理员可见） -->
+                    <button id="detailDeleteBtn" onclick="app.deleteCurrentEvent()" class="hidden px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         删除
                     </button>
                 </div>
             </div>
 
-            <!-- 状态管理卡片 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+            <!-- 状态管理卡片（仅管理员可见） -->
+            <div id="statusManagerCard" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
                 <h3 class="text-sm font-medium text-slate-700 mb-4">状态管理</h3>
                 <div class="flex flex-wrap gap-3">
                     <button onclick="app.changeStatus('developing')" class="status-btn px-4 py-2 rounded-lg text-sm font-medium border transition-all hover:scale-105" data-status="developing">
@@ -327,7 +415,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                                     对比上一版本
                                 </button>
-                                <button onclick="app.restoreVersion()" id="restoreBtn" class="px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-1">
+                                <button onclick="app.restoreVersion()" id="restoreBtn" class="hidden px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
                                     回滚到此版本
                                 </button>
@@ -484,7 +572,7 @@
         </div>
     </div>
 
-    <!-- 复制埋点弹窗（新增） -->
+    <!-- 复制埋点弹窗 -->
     <div id="copyModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closeCopyModal()"></div>
         <div class="absolute inset-y-0 right-0 w-full md:w-[650px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full overflow-y-auto custom-scrollbar" id="copyModalPanel">
@@ -697,6 +785,18 @@
         </div>
     </div>
 
+    <!-- 权限不足提示 -->
+    <div id="permissionAlert" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full relative z-10">
+            <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-center text-slate-900 mb-2">权限不足</h3>
+            <p class="text-center text-slate-500 mb-6">您当前是<strong>只读用户</strong>，没有权限执行此操作。请联系管理员获取编辑权限。</p>
+            <button onclick="app.closePermissionAlert()" class="w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 font-medium transition-colors">我知道了</button>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
         <div class="bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
@@ -712,15 +812,114 @@
                 this.currentEventId = null;
                 this.currentVersionIndex = null;
                 this.deleteEventId = null;
-                this.copySourceEvent = null; // 用于存储待复制的源事件
+                this.copySourceEvent = null;
+                // 权限相关
+                this.currentUser = null; // { role: 'admin' | 'viewer', name: string }
+                this.permissions = {
+                    admin: ['create', 'read', 'update', 'delete', 'export', 'import', 'change_status'],
+                    viewer: ['read', 'export']
+                };
                 this.init();
             }
 
             init() {
                 this.loadData();
+                this.checkLoginStatus();
+            }
+
+            // 检查登录状态
+            checkLoginStatus() {
+                const savedUser = localStorage.getItem('tracking_current_user');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.showMainApp();
+                } else {
+                    document.getElementById('loginModal').classList.remove('hidden');
+                }
+            }
+
+            // 登录
+            login(role) {
+                const roleNames = {
+                    'admin': '管理员',
+                    'viewer': '访客'
+                };
+                
+                this.currentUser = {
+                    role: role,
+                    name: roleNames[role],
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('tracking_current_user', JSON.stringify(this.currentUser));
+                document.getElementById('loginModal').classList.add('hidden');
+                this.showMainApp();
+                this.showToast(`欢迎回来，${this.currentUser.name}`);
+            }
+
+            // 登出
+            logout() {
+                if (confirm('确定要退出登录吗？')) {
+                    this.currentUser = null;
+                    localStorage.removeItem('tracking_current_user');
+                    location.reload();
+                }
+            }
+
+            // 检查权限
+            hasPermission(action) {
+                if (!this.currentUser) return false;
+                return this.permissions[this.currentUser.role]?.includes(action) || false;
+            }
+
+            // 显示主应用
+            showMainApp() {
+                // 更新用户角色显示
+                const badge = document.getElementById('userRoleBadge');
+                const roleIcon = document.getElementById('roleIcon');
+                const roleText = document.getElementById('roleText');
+                
+                badge.classList.remove('hidden');
+                if (this.currentUser.role === 'admin') {
+                    badge.className = 'px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 flex items-center gap-2';
+                    roleIcon.textContent = '👨‍💼';
+                    roleText.textContent = '管理员';
+                } else {
+                    badge.className = 'px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200 flex items-center gap-2';
+                    roleIcon.textContent = '👀';
+                    roleText.textContent = '访客';
+                }
+
+                // 根据权限显示/隐藏按钮
+                if (this.hasPermission('create')) {
+                    document.getElementById('createBtn').classList.remove('hidden');
+                    document.getElementById('importBtn').classList.remove('hidden');
+                } else {
+                    // 显示访客提示
+                    document.getElementById('viewerNotice').classList.remove('hidden');
+                }
+
                 this.renderList();
                 this.updateStats();
                 this.updateFilters();
+            }
+
+            // 显示权限不足提示
+            showPermissionDenied() {
+                document.getElementById('permissionAlert').classList.remove('hidden');
+            }
+
+            closePermissionAlert() {
+                document.getElementById('permissionAlert').classList.add('hidden');
+            }
+
+            // 包装需要权限的方法
+            checkPermissionWrapper(action, callback) {
+                if (this.hasPermission(action)) {
+                    callback();
+                } else {
+                    this.showPermissionDenied();
+                }
             }
 
             loadData() {
@@ -728,7 +927,7 @@
                 if (saved) {
                     this.events = JSON.parse(saved);
                 } else {
-                    // 示例数据，更新为新的 fixedValues 格式（包含含义）
+                    // 示例数据
                     this.events = [
                         {
                             id: 'evt_1',
@@ -754,7 +953,6 @@
                                             type: 'string', 
                                             desc: '广告类型', 
                                             valueType: 'fixed',
-                                            // 新的数据结构：固定值包含 value 和 desc
                                             fixedValues: [
                                                 {value: 'interstitials', desc: '插屏广告'},
                                                 {value: 'native', desc: '原生广告'},
@@ -823,9 +1021,7 @@
                 this.updateFilters();
             }
 
-            // 更新所有筛选器选项
             updateFilters() {
-                // 更新版本筛选
                 const versionSet = new Set();
                 const moduleSet = new Set();
                 
@@ -834,7 +1030,6 @@
                     if (event.module) moduleSet.add(event.module);
                 });
                 
-                // 版本筛选
                 const versions = Array.from(versionSet).sort((a, b) => this.compareVersion(b, a));
                 const versionSelect = document.getElementById('versionFilter');
                 const currentVersion = versionSelect.value;
@@ -842,7 +1037,6 @@
                     versions.map(v => `<option value="${v}">v${v}</option>`).join('');
                 versionSelect.value = currentVersion;
 
-                // 模块筛选
                 const modules = Array.from(moduleSet).sort();
                 const moduleSelect = document.getElementById('moduleFilter');
                 const currentModule = moduleSelect.value;
@@ -861,16 +1055,13 @@
                 }).length;
                 document.getElementById('todayCount').textContent = todayCount;
                 
-                // 开发中数量
                 const developingCount = this.events.filter(e => e.status === 'developing').length;
                 document.getElementById('developingCount').textContent = developingCount;
                 
-                // 已上线数量
                 const onlineCount = this.events.filter(e => e.status === 'online').length;
                 document.getElementById('onlineCount').textContent = onlineCount;
             }
 
-            // 状态标签样式
             getStatusClass(status) {
                 const map = {
                     'developing': 'status-developing',
@@ -893,7 +1084,6 @@
                 return map[status] || status;
             }
 
-            // 搜索与筛选
             handleSearch() {
                 this.renderList();
                 this.updateFilterStatus();
@@ -1075,7 +1265,6 @@
                 return date.toLocaleDateString('zh-CN');
             }
 
-            // 模块选择处理
             handleModuleChange(type) {
                 const select = document.getElementById(type === 'create' ? 'newEventModule' : type === 'copy' ? 'copyEventModule' : 'editEventModule');
                 const customInput = document.getElementById(type === 'create' ? 'newEventModuleCustom' : type === 'copy' ? 'copyEventModuleCustom' : 'editEventModuleCustom');
@@ -1091,7 +1280,6 @@
                 }
             }
 
-            // 参数值类型切换
             toggleValueType(rowId, type) {
                 const row = document.getElementById(rowId);
                 const exampleSection = row.querySelector('.value-example-section');
@@ -1112,7 +1300,6 @@
                 }
             }
 
-            // 添加固定值输入框，现在包含"值"和"含义"两列
             addFixedValueInput(containerId, value = '', desc = '') {
                 const container = document.getElementById(containerId);
                 const div = document.createElement('div');
@@ -1132,7 +1319,6 @@
                 container.appendChild(div);
             }
 
-            // 详情页
             viewEventDetail(eventId) {
                 this.currentEventId = eventId;
                 const event = this.events.find(e => e.id === eventId);
@@ -1147,36 +1333,43 @@
                 document.getElementById('detailModule').textContent = `模块: ${event.module || '未分类'}`;
                 document.getElementById('versionTotalCount').textContent = `${event.versions.length} 个版本`;
                 
-                // 状态标签
                 const statusEl = document.getElementById('detailStatus');
                 statusEl.className = `px-3 py-1 rounded-full text-sm font-medium border ${this.getStatusClass(event.status)}`;
                 statusEl.textContent = this.getStatusText(event.status);
                 
-                // 更新状态按钮高亮
-                document.querySelectorAll('.status-btn').forEach(btn => {
-                    if (btn.dataset.status === event.status) {
-                        btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500', 'bg-opacity-100');
-                        btn.style.opacity = '1';
-                    } else {
-                        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500');
-                        btn.style.opacity = '0.6';
-                    }
-                });
+                // 根据权限显示/隐藏操作按钮
+                if (this.hasPermission('update')) {
+                    document.getElementById('detailEditBtn').classList.remove('hidden');
+                    document.getElementById('detailCopyBtn').classList.remove('hidden');
+                    document.getElementById('statusManagerCard').classList.remove('hidden');
+                } else {
+                    document.getElementById('detailEditBtn').classList.add('hidden');
+                    document.getElementById('detailCopyBtn').classList.add('hidden');
+                    document.getElementById('statusManagerCard').classList.add('hidden');
+                }
+
+                if (this.hasPermission('delete')) {
+                    document.getElementById('detailDeleteBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('detailDeleteBtn').classList.add('hidden');
+                }
                 
                 this.renderVersionHistory(event);
                 this.selectVersion(0);
             }
 
-            // 更改状态
+            // 修改后的状态变更方法，增加权限检查
             changeStatus(newStatus) {
-                if (!this.currentEventId) return;
-                const event = this.events.find(e => e.id === this.currentEventId);
-                if (event.status === newStatus) return;
-                
-                event.status = newStatus;
-                this.saveData();
-                this.viewEventDetail(this.currentEventId);
-                this.showToast(`状态已更新为: ${this.getStatusText(newStatus)}`);
+                this.checkPermissionWrapper('change_status', () => {
+                    if (!this.currentEventId) return;
+                    const event = this.events.find(e => e.id === this.currentEventId);
+                    if (event.status === newStatus) return;
+                    
+                    event.status = newStatus;
+                    this.saveData();
+                    this.viewEventDetail(this.currentEventId);
+                    this.showToast(`状态已更新为: ${this.getStatusText(newStatus)}`);
+                });
             }
 
             renderVersionHistory(event) {
@@ -1228,7 +1421,6 @@
                     paramContainer.innerHTML = version.parameters.map(p => {
                         let valueDisplay = '';
                         if (p.valueType === 'fixed' && p.fixedValues?.length > 0) {
-                            // 显示固定值及其含义
                             valueDisplay = `
                                 <div class="mt-2 space-y-1">
                                     <span class="text-xs text-slate-400">固定值列表：</span>
@@ -1271,7 +1463,14 @@
                 document.getElementById('diffView').classList.add('hidden');
                 
                 const isLatest = index === 0;
-                document.getElementById('restoreBtn').style.display = isLatest ? 'none' : 'inline-flex';
+                
+                // 回滚按钮仅管理员可见
+                if (this.hasPermission('update') && !isLatest) {
+                    document.getElementById('restoreBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('restoreBtn').classList.add('hidden');
+                }
+                
                 document.getElementById('compareBtn').style.display = index < versions.length - 1 ? 'inline-flex' : 'none';
             }
 
@@ -1318,7 +1517,6 @@
                 const changedParams = currParams.filter(cp => {
                     const pp = prevParams.find(p => p.name === cp.name);
                     if (!pp) return false;
-                    // 检查值类型或值内容是否变化
                     const valueChanged = cp.valueType !== pp.valueType || 
                                         cp.example !== pp.example ||
                                         JSON.stringify(cp.fixedValues || []) !== JSON.stringify(pp.fixedValues || []);
@@ -1399,27 +1597,29 @@
             }
 
             restoreVersion() {
-                if (!confirm('确定要回滚到此版本吗？这将创建一个新的版本记录。')) return;
-                
-                const event = this.events.find(e => e.id === this.currentEventId);
-                const versions = [...event.versions].reverse();
-                const targetVersion = versions[this.currentVersionIndex];
-                
-                const newVersion = {
-                    ...targetVersion,
-                    version: this.incrementVersion(event.currentVersion),
-                    changeLog: `从 v${targetVersion.version} 回滚`,
-                    createdAt: new Date().toISOString(),
-                    createdBy: 'current_user'
-                };
-                
-                event.versions.push(newVersion);
-                event.currentVersion = newVersion.version;
-                
-                this.saveData();
-                this.renderVersionHistory(event);
-                this.selectVersion(0);
-                this.showToast('已回滚并创建新版本');
+                this.checkPermissionWrapper('update', () => {
+                    if (!confirm('确定要回滚到此版本吗？这将创建一个新的版本记录。')) return;
+                    
+                    const event = this.events.find(e => e.id === this.currentEventId);
+                    const versions = [...event.versions].reverse();
+                    const targetVersion = versions[this.currentVersionIndex];
+                    
+                    const newVersion = {
+                        ...targetVersion,
+                        version: this.incrementVersion(event.currentVersion),
+                        changeLog: `从 v${targetVersion.version} 回滚`,
+                        createdAt: new Date().toISOString(),
+                        createdBy: 'current_user'
+                    };
+                    
+                    event.versions.push(newVersion);
+                    event.currentVersion = newVersion.version;
+                    
+                    this.saveData();
+                    this.renderVersionHistory(event);
+                    this.selectVersion(0);
+                    this.showToast('已回滚并创建新版本');
+                });
             }
 
             incrementVersion(version) {
@@ -1437,16 +1637,26 @@
             }
 
             editCurrentEvent() {
-                if (!this.currentEventId) return;
-                this.openEditModal(this.currentEventId);
+                this.checkPermissionWrapper('update', () => {
+                    if (!this.currentEventId) return;
+                    this.openEditModal(this.currentEventId);
+                });
             }
 
             deleteCurrentEvent() {
-                if (!this.currentEventId) return;
-                this.deleteEvent(this.currentEventId);
+                this.checkPermissionWrapper('delete', () => {
+                    if (!this.currentEventId) return;
+                    this.deleteEvent(this.currentEventId);
+                });
             }
 
             openEditModal(eventId) {
+                // 额外检查权限
+                if (!this.hasPermission('update')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+
                 const event = this.events.find(e => e.id === eventId);
                 if (!event) return;
                 
@@ -1456,7 +1666,6 @@
                 document.getElementById('editEventName').value = event.name;
                 document.getElementById('editEventNameZh').value = event.nameZh || '';
                 document.getElementById('editEventDesc').value = latest.desc || '';
-                // 默认显示当前版本号
                 document.getElementById('editEventVersion').value = event.currentVersion;
                 document.getElementById('editChangeLog').value = '';
                 
@@ -1515,7 +1724,6 @@
                     <input type="text" placeholder="参数描述" value="${data?.desc || ''}" required
                            class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     
-                    <!-- 值类型选择 -->
                     <div class="space-y-2">
                         <label class="text-xs font-medium text-slate-500">参数值类型</label>
                         <div class="flex gap-2">
@@ -1530,13 +1738,11 @@
                         </div>
                     </div>
                     
-                    <!-- 示例值输入 -->
                     <div class="value-example-section ${isFixed ? 'hidden' : ''}">
                         <input type="text" placeholder="示例值 (如：ad_123)" value="${data?.example || ''}"
                                class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     
-                    <!-- 固定值输入：现在包含值和含义两列 -->
                     <div class="value-fixed-section ${!isFixed ? 'hidden' : ''}">
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
@@ -1590,6 +1796,12 @@
             saveEvent(e) {
                 e.preventDefault();
                 
+                // 权限检查
+                if (!this.hasPermission('update')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+                
                 const eventId = document.getElementById('editEventId').value;
                 const event = this.events.find(ev => ev.id === eventId);
                 const newVersion = document.getElementById('editEventVersion').value.trim();
@@ -1599,13 +1811,11 @@
                     return;
                 }
                 
-                // 检查是否小于当前版本
                 if (this.compareVersion(newVersion, event.currentVersion) < 0) {
                     this.showToast('新版本号不能低于当前版本 ' + event.currentVersion, 'error');
                     return;
                 }
                 
-                // 收集参数数据
                 const parameters = [];
                 document.querySelectorAll('#editParametersList > div').forEach(row => {
                     const isFixed = !row.querySelector('.value-fixed-section').classList.contains('hidden');
@@ -1617,7 +1827,6 @@
                     };
                     
                     if (isFixed) {
-                        // 收集固定值及其含义
                         const valueInputs = row.querySelectorAll('.param-fixed-value');
                         const descInputs = row.querySelectorAll('.param-fixed-desc');
                         paramData.fixedValues = [];
@@ -1646,19 +1855,15 @@
                     createdBy: 'current_user'
                 };
                 
-                // 判断是覆盖当前版本还是创建新版本
                 if (newVersion === event.currentVersion) {
-                    // 等于当前版本：覆盖最后一个版本
                     event.versions[event.versions.length - 1] = versionData;
                     this.showToast('当前版本已更新');
                 } else {
-                    // 大于当前版本：追加新版本
                     event.versions.push(versionData);
                     event.currentVersion = newVersion;
                     this.showToast('新版本已保存');
                 }
                 
-                // 更新中文名称
                 event.nameZh = document.getElementById('editEventNameZh').value.trim();
                 
                 this.saveData();
@@ -1673,6 +1878,12 @@
             }
 
             openCreateModal() {
+                // 权限检查
+                if (!this.hasPermission('create')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+
                 document.getElementById('createForm').reset();
                 document.getElementById('createParametersList').innerHTML = '';
                 document.getElementById('createNoParams').classList.remove('hidden');
@@ -1723,7 +1934,6 @@
                     <input type="text" placeholder="参数描述" required
                            class="param-desc w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     
-                    <!-- 值类型选择 -->
                     <div class="space-y-2">
                         <label class="text-xs font-medium text-slate-500">参数值类型</label>
                         <div class="flex gap-2">
@@ -1738,13 +1948,11 @@
                         </div>
                     </div>
                     
-                    <!-- 示例值输入 -->
                     <div class="value-example-section">
                         <input type="text" placeholder="示例值 (如：ad_123)"
                                class="param-example w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     
-                    <!-- 固定值输入：包含值和含义两列 -->
                     <div class="value-fixed-section hidden">
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
@@ -1782,6 +1990,12 @@
             createNewEvent(e) {
                 e.preventDefault();
                 
+                // 权限检查
+                if (!this.hasPermission('create')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+                
                 const name = document.getElementById('newEventName').value.trim();
                 
                 if (this.events.find(ev => ev.name === name)) {
@@ -1789,7 +2003,6 @@
                     return;
                 }
                 
-                // 获取模块值
                 const moduleSelect = document.getElementById('newEventModule');
                 const moduleCustom = document.getElementById('newEventModuleCustom');
                 const module = moduleSelect.value === 'custom' ? moduleCustom.value.trim() : moduleSelect.value;
@@ -1810,7 +2023,6 @@
                     };
                     
                     if (isFixed) {
-                        // 收集固定值及其含义
                         const valueInputs = row.querySelectorAll('.param-fixed-value');
                         const descInputs = row.querySelectorAll('.param-fixed-desc');
                         paramData.fixedValues = [];
@@ -1881,6 +2093,12 @@
             }
 
             confirmDelete() {
+                if (!this.hasPermission('delete')) {
+                    this.showPermissionDenied();
+                    this.closeDeleteModal();
+                    return;
+                }
+
                 if (this.deleteEventId) {
                     this.events = this.events.filter(e => e.id !== this.deleteEventId);
                     this.saveData();
@@ -1896,8 +2114,12 @@
                 }
             }
 
-            // 复制埋点相关方法
             openCopyModal() {
+                if (!this.hasPermission('create')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+
                 if (!this.currentEventId) return;
                 
                 const sourceEvent = this.events.find(e => e.id === this.currentEventId);
@@ -1905,13 +2127,11 @@
                 
                 this.copySourceEvent = sourceEvent;
                 
-                // 填充表单
                 document.getElementById('copySourceEventName').textContent = sourceEvent.name;
                 document.getElementById('copyEventName').value = sourceEvent.name + '_copy';
                 document.getElementById('copyEventNameZh').value = (sourceEvent.nameZh || '') + '（副本）';
                 document.getElementById('copyEventDesc').value = sourceEvent.versions[sourceEvent.versions.length - 1].desc || '';
                 
-                // 设置模块选择
                 const moduleSelect = document.getElementById('copyEventModule');
                 const moduleCustom = document.getElementById('copyEventModuleCustom');
                 if (sourceEvent.module && [...moduleSelect.options].some(o => o.value === sourceEvent.module)) {
@@ -1923,10 +2143,8 @@
                     moduleCustom.value = sourceEvent.module || '';
                 }
                 
-                // 设置状态
                 document.getElementById('copyEventStatus').value = sourceEvent.status;
                 
-                // 显示参数预览
                 const latestVersion = sourceEvent.versions[sourceEvent.versions.length - 1];
                 const params = latestVersion.parameters || [];
                 document.getElementById('copyParamCount').textContent = params.length;
@@ -1957,7 +2175,6 @@
                     previewContainer.innerHTML = '<p class="text-sm text-slate-400 italic text-center py-4">原埋点无参数定义</p>';
                 }
                 
-                // 重置错误提示
                 document.getElementById('copyNameError').classList.add('hidden');
                 document.getElementById('copyEventName').classList.remove('border-red-500', 'focus:ring-red-500');
                 
@@ -1966,7 +2183,6 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => panel.classList.remove('translate-x-full'), 10);
                 
-                // 添加实时验证
                 document.getElementById('copyEventName').oninput = (e) => {
                     const newName = e.target.value.trim();
                     const nameError = document.getElementById('copyNameError');
@@ -1995,25 +2211,28 @@
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     this.copySourceEvent = null;
-                    document.getElementById('copyEventName').oninput = null; // 移除验证事件
+                    document.getElementById('copyEventName').oninput = null;
                 }, 300);
             }
 
             copyEvent(e) {
                 e.preventDefault();
                 
+                if (!this.hasPermission('create')) {
+                    this.showPermissionDenied();
+                    return;
+                }
+                
                 if (!this.copySourceEvent) return;
                 
                 const newName = document.getElementById('copyEventName').value.trim();
                 
-                // 再次验证名称是否重复
                 if (this.events.find(ev => ev.name === newName)) {
                     this.showToast('Event 名称已存在，请使用其他名称', 'error');
                     document.getElementById('copyEventName').focus();
                     return;
                 }
                 
-                // 获取模块值
                 const moduleSelect = document.getElementById('copyEventModule');
                 const moduleCustom = document.getElementById('copyEventModuleCustom');
                 const module = moduleSelect.value === 'custom' ? moduleCustom.value.trim() : moduleSelect.value;
@@ -2023,14 +2242,13 @@
                     return;
                 }
                 
-                // 深拷贝版本数据
                 const copiedVersions = this.copySourceEvent.versions.map(v => ({
                     ...v,
                     parameters: v.parameters ? v.parameters.map(p => ({
                         ...p,
                         fixedValues: p.fixedValues ? p.fixedValues.map(fv => ({...fv})) : undefined
                     })) : [],
-                    createdAt: new Date().toISOString(), // 更新时间
+                    createdAt: new Date().toISOString(),
                     createdBy: 'current_user',
                     changeLog: v.changeLog + ' (复制自 ' + this.copySourceEvent.name + ')'
                 }));
@@ -2045,7 +2263,6 @@
                     versions: copiedVersions
                 };
                 
-                // 更新最新版本的changeLog
                 const latestVersion = newEvent.versions[newEvent.versions.length - 1];
                 latestVersion.changeLog = `从 ${this.copySourceEvent.name} 复制创建`;
                 
@@ -2054,10 +2271,8 @@
                 this.closeCopyModal();
                 this.renderList();
                 
-                // 询问是否跳转到新埋点详情
                 this.showToast(`埋点 "${newName}" 复制成功`);
                 
-                // 高亮新创建的埋点并可选中
                 setTimeout(() => {
                     if (confirm('是否查看新复制的埋点详情？')) {
                         this.viewEventDetail(newEvent.id);
@@ -2065,30 +2280,25 @@
                 }, 500);
             }
 
-            // 导出Excel（只导出最新版本的参数）
             exportExcel() {
                 if (this.events.length === 0) {
                     this.showToast('没有数据可导出', 'error');
                     return;
                 }
 
-                // 准备数据
                 const exportData = [];
-                const merges = []; // 存储合并单元格的信息
-                let currentRow = 1; // 从1开始，因为0是表头行
+                const merges = [];
+                let currentRow = 1;
 
                 this.events.forEach(event => {
-                    // 只取最新版本，不再遍历所有版本
                     const version = event.versions[event.versions.length - 1];
                     const params = version.parameters || [];
-                    const paramCount = params.length > 0 ? params.length : 1; // 无参数时至少占1行
+                    const paramCount = params.length > 0 ? params.length : 1;
                     
-                    // 添加数据行
                     if (params.length > 0) {
                         params.forEach((param, paramIndex) => {
                             let valueContent = '';
                             if (param.valueType === 'fixed' && param.fixedValues) {
-                                // 导出格式：值(含义), 值(含义)
                                 valueContent = param.fixedValues.map(fv => {
                                     return fv.desc ? `${fv.value}(${fv.desc})` : fv.value;
                                 }).join(', ');
@@ -2111,7 +2321,6 @@
                             });
                         });
                     } else {
-                        // 无参数的版本也占一行
                         exportData.push({
                             'Event名称': event.name,
                             '中文名称': event.nameZh || '',
@@ -2127,12 +2336,10 @@
                         });
                     }
                     
-                    // 如果该事件有多行参数，合并事件级别的列（前6列：Event名称、中文名称、所属模块、状态、版本号、版本描述）
                     if (paramCount > 1) {
                         const startRow = currentRow;
                         const endRow = currentRow + paramCount - 1;
                         
-                        // 合并前6列（0-5列）
                         for (let col = 0; col < 6; col++) {
                             merges.push({
                                 s: {r: startRow, c: col},
@@ -2144,40 +2351,27 @@
                     currentRow += paramCount;
                 });
 
-                // 创建工作簿
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(exportData);
                 
-                // 设置合并单元格
                 if (merges.length > 0) {
                     ws['!merges'] = merges;
                 }
                 
-                // 设置列宽
                 const colWidths = [
-                    {wch: 20}, // Event名称 (0)
-                    {wch: 15}, // 中文名称 (1)
-                    {wch: 12}, // 所属模块 (2)
-                    {wch: 10}, // 状态 (3)
-                    {wch: 10}, // 版本号 (4)
-                    {wch: 35}, // 版本描述 (5)
-                    {wch: 15}, // 参数名 (6)
-                    {wch: 10}, // 参数类型 (7)
-                    {wch: 20}, // 参数描述 (8)
-                    {wch: 10}, // 值类型 (9)
-                    {wch: 40}  // 值内容 (10)
+                    {wch: 20}, {wch: 15}, {wch: 12}, {wch: 10}, 
+                    {wch: 10}, {wch: 35}, {wch: 15}, {wch: 10}, 
+                    {wch: 20}, {wch: 10}, {wch: 40}
                 ];
                 ws['!cols'] = colWidths;
 
                 XLSX.utils.book_append_sheet(wb, ws, "埋点数据");
                 
-                // 下载文件
                 const dateStr = new Date().toISOString().split('T')[0];
                 XLSX.writeFile(wb, `埋点数据_${dateStr}.xlsx`);
                 this.showToast('Excel导出成功（仅含最新版本）');
             }
 
-            // 下载模板
             downloadTemplate() {
                 const templateData = [
                     {
@@ -2224,7 +2418,6 @@
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(templateData);
                 
-                // 添加说明行
                 const instructions = [
                     ['埋点数据导入模板'],
                     ['填写说明：'],
@@ -2244,10 +2437,8 @@
                     ['示例数据（可删除后填写真实数据）：']
                 ];
                 
-                // 将说明插入到顶部
                 XLSX.utils.sheet_add_aoa(ws, instructions, {origin: -1});
                 
-                // 设置列宽
                 ws['!cols'] = [
                     {wch: 20}, {wch: 15}, {wch: 12}, {wch: 10}, 
                     {wch: 10}, {wch: 35}, {wch: 15}, {wch: 10}, 
@@ -2259,8 +2450,14 @@
                 this.showToast('模板下载成功');
             }
 
-            // 导入Excel
             importExcel(input) {
+                // 权限检查
+                if (!this.hasPermission('import')) {
+                    this.showPermissionDenied();
+                    input.value = '';
+                    return;
+                }
+
                 const file = input.files[0];
                 if (!file) return;
                 
@@ -2270,11 +2467,9 @@
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, {type: 'array'});
                         
-                        // 读取第一个工作表
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
                         
-                        // 转换为JSON
                         const jsonData = XLSX.utils.sheet_to_json(worksheet);
                         
                         if (jsonData.length === 0) {
@@ -2282,11 +2477,9 @@
                             return;
                         }
 
-                        // 处理导入的数据
                         let added = 0;
                         let updated = 0;
 
-                        // 按 Event名称+版本号 分组处理参数
                         const groupedData = {};
                         
                         jsonData.forEach(row => {
@@ -2307,7 +2500,6 @@
                                 };
                             }
                             
-                            // 如果有参数数据，添加到参数列表
                             if (row['参数名']) {
                                 const param = {
                                     name: row['参数名'].toString().trim(),
@@ -2316,7 +2508,6 @@
                                     valueType: row['值类型'] === '固定值' ? 'fixed' : 'example'
                                 };
 
-                                // 解析值内容
                                 if (row['值内容']) {
                                     const valueContent = row['值内容'].toString().trim();
                                     if (param.valueType === 'fixed') {
@@ -2345,11 +2536,9 @@
                             }
                         });
 
-                        // 处理分组后的数据
                         Object.values(groupedData).forEach(group => {
                             const { eventName, version, eventData, params } = group;
                             
-                            // 状态映射
                             const statusMap = {
                                 '开发中': 'developing',
                                 '已完成': 'done',
@@ -2362,17 +2551,13 @@
                             let existingEvent = this.events.find(ev => ev.name === eventName);
                             
                             if (existingEvent) {
-                                // 检查版本是否已存在
                                 const existingVersion = existingEvent.versions.find(v => v.version === version);
                                 
                                 if (existingVersion) {
-                                    // 更新现有版本
                                     existingVersion.desc = eventData.desc || existingVersion.desc;
                                     existingVersion.parameters = params.length > 0 ? params : existingVersion.parameters;
-                                    // 不更新 changeLog 和 createdAt，保留原有记录
                                     updated++;
                                 } else {
-                                    // 添加新版本
                                     const newVersion = {
                                         version: version,
                                         desc: eventData.desc,
@@ -2386,13 +2571,11 @@
                                     updated++;
                                 }
                                 
-                                // 更新事件基本信息
                                 if (eventData.nameZh) existingEvent.nameZh = eventData.nameZh;
                                 if (eventData.module) existingEvent.module = eventData.module;
                                 existingEvent.status = status;
                                 
                             } else {
-                                // 创建新埋点
                                 const newEvent = {
                                     id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                                     name: eventName,
